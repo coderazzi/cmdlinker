@@ -14,7 +14,7 @@ public class IconLoader {
     
     private ImageIcon loadIcon(String name)
     {
-        return new ImageIcon(getClass().getResource("images/"+name+".gif"));
+        return new ImageIcon(getClass().getResource("/images/"+name+".gif"));
     }
     
 }
