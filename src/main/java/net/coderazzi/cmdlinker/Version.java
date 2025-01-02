@@ -1,4 +1,4 @@
-package com.byteslooser.cmdlinker;
+package net.coderazzi.cmdlinker;
 
 public abstract class Version {
     public static String getVersion() {

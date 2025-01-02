@@ -1,4 +1,4 @@
-package com.byteslooser.cmdlinker;
+package net.coderazzi.cmdlinker;
 
 import java.awt.Color;
 import java.awt.Font;

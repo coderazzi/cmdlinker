@@ -1,4 +1,4 @@
-package com.byteslooser.cmdlinker;
+package net.coderazzi.cmdlinker;
 
 import java.io.BufferedReader;
 import java.io.IOException;

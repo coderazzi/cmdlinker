@@ -8,9 +8,9 @@
   <packaging>jar</packaging>
   <version>0.9.8</version>
   <name>cmdlinker</name>
-  <dependencyManagement>
-    <dependencies/>
-  </dependencyManagement>
+  <properties>
+          <exec.mainClass>net.coderazzi.cmdlinker.CmdLinker</exec.mainClass>
+  </properties>
   <build>
     <plugins>
       <plugin>
