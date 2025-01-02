@@ -18,7 +18,7 @@ public class TabOptions extends JPanel {
 
     private JCheckBox autoScroll;
 
-    private JComboBox fonts;
+    private JComboBox<Integer> fonts;
 
     public TabOptions(Tab tab, int fontSize, boolean autoscroll) {
         super(new BorderLayout());

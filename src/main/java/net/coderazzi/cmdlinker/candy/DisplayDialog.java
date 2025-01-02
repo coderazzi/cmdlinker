@@ -92,7 +92,7 @@ public class DisplayDialog extends EscapeDialog {
                 area.setForeground(foreground);
             }
         });
-        final JComboBox fonts = createFontsCombobox();
+        final JComboBox<Integer> fonts = createFontsCombobox();
         fonts.setSelectedItem(new Integer(font.getSize()));
         fonts.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
@@ -180,8 +180,8 @@ public class DisplayDialog extends EscapeDialog {
         return sb.toString();
     }
 
-    public static JComboBox createFontsCombobox() {
-        JComboBox ret = new JComboBox(getFontSizes());
+    public static JComboBox<Integer> createFontsCombobox() {
+        JComboBox<Integer> ret = new JComboBox<Integer>(getFontSizes());
         ret.setEditable(false);
         return ret;
     }

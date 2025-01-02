@@ -1,6 +1,5 @@
 package net.coderazzi.cmdlinker.candy;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 public class IconLoader {
