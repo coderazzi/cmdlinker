@@ -1,12 +1,13 @@
-package com.byteslooser.cmdlinker.commands;
+package net.coderazzi.cmdlinker.commands;
 
 import java.awt.Color;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.byteslooser.cmdlinker.ScriptCommandException;
-import com.byteslooser.cmdlinker.ScriptProcessorListener;
-import com.byteslooser.cmdlinker.candy.ColorString;
+import net.coderazzi.cmdlinker.ScriptCommandException;
+import net.coderazzi.cmdlinker.ScriptProcessorListener;
+
+import net.coderazzi.cmdlinker.candy.ColorString;
 
 /**
  * Command to accepts the color command line Color command line has syntax:

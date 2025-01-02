@@ -3,7 +3,7 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.coderazzi</groupId>
+  <groupId>net.coderazzi</groupId>
   <artifactId>cmdlinker</artifactId>
   <packaging>jar</packaging>
   <version>0.9.8</version>
@@ -32,7 +32,7 @@
 	      <configuration>
           <archive>
             <manifest>
-              <mainClass>com.coderazzi.cmdlinker.CmdLinker</mainClass>
+              <mainClass>net.coderazzi.cmdlinker.CmdLinker</mainClass>
             </manifest>
           </archive>
         </configuration>

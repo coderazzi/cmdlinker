@@ -1,7 +1,7 @@
-package com.byteslooser.cmdlinker.commands;
+package net.coderazzi.cmdlinker.commands;
 
-import com.byteslooser.cmdlinker.ScriptCommandException;
-import com.byteslooser.cmdlinker.ScriptProcessorListener;
+import net.coderazzi.cmdlinker.ScriptCommandException;
+import net.coderazzi.cmdlinker.ScriptProcessorListener;
 
 public abstract class ScriptCommand {
     private String command;

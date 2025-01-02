@@ -1,13 +1,14 @@
-package com.byteslooser.cmdlinker.commands;
+package net.coderazzi.cmdlinker.commands;
 
 import java.awt.Font;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.byteslooser.cmdlinker.CmdLinker;
-import com.byteslooser.cmdlinker.ScriptCommandException;
-import com.byteslooser.cmdlinker.ScriptProcessorListener;
+import net.coderazzi.cmdlinker.ScriptCommandException;
+import net.coderazzi.cmdlinker.ScriptProcessorListener;
+
+import net.coderazzi.cmdlinker.CmdLinker;
 
 /**
  * Command to accepts the font command line Font command line has syntax: font

@@ -1,4 +1,4 @@
-package com.byteslooser.cmdlinker.candy;
+package net.coderazzi.cmdlinker.candy;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -13,7 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import com.byteslooser.cmdlinker.CmdLinker;
+import net.coderazzi.cmdlinker.CmdLinker;
 
 public class ProcessingScriptSplashScreen extends JDialog {
     public ProcessingScriptSplashScreen(final CmdLinker owner,

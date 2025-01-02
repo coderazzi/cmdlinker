@@ -1,4 +1,4 @@
-package com.byteslooser.cmdlinker.candy;
+package net.coderazzi.cmdlinker.candy;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -11,7 +11,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.byteslooser.cmdlinker.Tab;
+import net.coderazzi.cmdlinker.Tab;
 
 public class TabOptions extends JPanel {
     private Tab owner;

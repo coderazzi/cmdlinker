@@ -1,4 +1,4 @@
-package com.byteslooser.cmdlinker;
+package net.coderazzi.cmdlinker;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -6,14 +6,14 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.HashMap;
 
-import com.byteslooser.cmdlinker.commands.ScriptColorsCommand;
-import com.byteslooser.cmdlinker.commands.ScriptCommand;
-import com.byteslooser.cmdlinker.commands.ScriptCreateTabCommand;
-import com.byteslooser.cmdlinker.commands.ScriptExecuteCommand;
-import com.byteslooser.cmdlinker.commands.ScriptFontCommand;
-import com.byteslooser.cmdlinker.commands.ScriptScrollCommand;
-import com.byteslooser.cmdlinker.commands.ScriptShowTabCommand;
-import com.byteslooser.cmdlinker.commands.ScriptWaitCommand;
+import net.coderazzi.cmdlinker.commands.ScriptColorsCommand;
+import net.coderazzi.cmdlinker.commands.ScriptCommand;
+import net.coderazzi.cmdlinker.commands.ScriptCreateTabCommand;
+import net.coderazzi.cmdlinker.commands.ScriptExecuteCommand;
+import net.coderazzi.cmdlinker.commands.ScriptFontCommand;
+import net.coderazzi.cmdlinker.commands.ScriptScrollCommand;
+import net.coderazzi.cmdlinker.commands.ScriptShowTabCommand;
+import net.coderazzi.cmdlinker.commands.ScriptWaitCommand;
 
 public class ScriptProcessor implements Runnable {
     private ScriptProcessorListener owner;

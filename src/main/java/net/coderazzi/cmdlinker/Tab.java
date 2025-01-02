@@ -1,4 +1,4 @@
-package com.byteslooser.cmdlinker;
+package net.coderazzi.cmdlinker;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -21,10 +21,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
-import com.byteslooser.cmdlinker.candy.DisplayDialog;
-import com.byteslooser.cmdlinker.candy.TabMenu;
-import com.byteslooser.cmdlinker.candy.TabOptions;
-import com.byteslooser.cmdlinker.candy.TabStatus;
+import net.coderazzi.cmdlinker.candy.DisplayDialog;
+import net.coderazzi.cmdlinker.candy.TabMenu;
+import net.coderazzi.cmdlinker.candy.TabOptions;
+import net.coderazzi.cmdlinker.candy.TabStatus;
 
 public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
     final static private int MAX_LINE_LENGTH_TO_CUT = 80;

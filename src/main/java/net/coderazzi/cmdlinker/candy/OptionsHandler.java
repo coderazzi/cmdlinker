@@ -1,4 +1,4 @@
-package com.byteslooser.cmdlinker.candy;
+package net.coderazzi.cmdlinker.candy;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import com.byteslooser.cmdlinker.CmdLinker;
+import net.coderazzi.cmdlinker.CmdLinker;
 
 public class OptionsHandler {
     private final static String HELP_OPTION = "-help";

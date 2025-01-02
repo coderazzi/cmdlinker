@@ -1,4 +1,4 @@
-package com.byteslooser.cmdlinker.candy;
+package net.coderazzi.cmdlinker.candy;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,9 +14,9 @@ import javax.swing.KeyStroke;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.byteslooser.cmdlinker.CmdLinker;
-import com.byteslooser.cmdlinker.Tab;
-import com.byteslooser.cmdlinker.Version;
+import net.coderazzi.cmdlinker.CmdLinker;
+import net.coderazzi.cmdlinker.Tab;
+import net.coderazzi.cmdlinker.Version;
 
 public class MainMenu extends JMenuBar {
     private CmdLinker owner;

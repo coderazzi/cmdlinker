@@ -1,4 +1,4 @@
-package com.byteslooser.cmdlinker;
+package net.coderazzi.cmdlinker;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -20,13 +20,13 @@ import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.byteslooser.cmdlinker.candy.DisplayDialog;
-import com.byteslooser.cmdlinker.candy.IconLoader;
-import com.byteslooser.cmdlinker.candy.MainMenu;
-import com.byteslooser.cmdlinker.candy.OptionsHandler;
-import com.byteslooser.cmdlinker.candy.ProcessingScriptSplashScreen;
-import com.byteslooser.cmdlinker.candy.RunCommandDialog;
-import com.byteslooser.cmdlinker.candy.RunScriptDialog;
+import net.coderazzi.cmdlinker.candy.DisplayDialog;
+import net.coderazzi.cmdlinker.candy.IconLoader;
+import net.coderazzi.cmdlinker.candy.MainMenu;
+import net.coderazzi.cmdlinker.candy.OptionsHandler;
+import net.coderazzi.cmdlinker.candy.ProcessingScriptSplashScreen;
+import net.coderazzi.cmdlinker.candy.RunCommandDialog;
+import net.coderazzi.cmdlinker.candy.RunScriptDialog;
 
 public class CmdLinker extends JFrame implements ScriptProcessorListener {
     public final static String DEFAULT_FONT_FAMILY = "Monospaced";

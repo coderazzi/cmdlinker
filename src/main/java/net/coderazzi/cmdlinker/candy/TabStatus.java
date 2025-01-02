@@ -1,4 +1,4 @@
-package com.byteslooser.cmdlinker.candy;
+package net.coderazzi.cmdlinker.candy;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -17,7 +17,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
-import com.byteslooser.cmdlinker.CommandExecutor;
+import net.coderazzi.cmdlinker.CommandExecutor;
 
 public class TabStatus {
     
