@@ -32,7 +32,7 @@
 	      <configuration>
           <archive>
             <manifest>
-              <mainClass>net.coderazzi.cmdlinker.CmdLinker</mainClass>
+              <mainClass>${exec.mainClass}</mainClass>
             </manifest>
           </archive>
         </configuration>
