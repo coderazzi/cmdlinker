@@ -270,55 +270,61 @@ public class OptionsHandler {
     private void handleInitialArgs(String[] args) {
         int i = 0;
         while (i < args.length && argumentsError == null) {
-            if (args[i].equals(HELP_OPTION)) {
-                argumentsError = getHelpString();
-            } else if (args[i].equals(FOREGROUND_OPTION)) {
-                if (++i == args.length)
-                    argumentsError = "Color not provided";
-                else {
-                    String color = args[i++];
-                    this.foreground = ColorString.getColor(color);
-                    if (this.foreground == null)
-                        argumentsError = "Invalid color:" + color;
-                }
-            } else if (args[i].equals(BACKGROUND_OPTION)) {
-                if (++i == args.length)
-                    argumentsError = "Color not provided";
-                else {
-                    String color = args[i++];
-                    this.background = ColorString.getColor(color);
-                    if (this.background == null)
-                        argumentsError = "Invalid color:" + color;
-                }
-            } else if (args[i].equals(FONT_OPTION)) {
-                if (++i == args.length)
-                    argumentsError = "Font size not provided";
-                else {
-                    String font = args[i++];
-                    try {
-                        this.fontSize = Integer.parseInt(font);
-                    } catch (NumberFormatException nfe) {
-                        argumentsError = "Invalid font size:" + font;
+            switch (args[i]) {
+                case HELP_OPTION:
+                    argumentsError = getHelpString();
+                    break;
+                case FOREGROUND_OPTION:
+                    if (++i == args.length)
+                        argumentsError = "Color not provided";
+                    else {
+                        String color = args[i++];
+                        this.foreground = ColorString.getColor(color);
+                        if (this.foreground == null)
+                            argumentsError = "Invalid color:" + color;
                     }
-                }
-            } else {
-                String first = args[i++];
-                if (first.equals(COMMAND_OPTION))
-                    this.isCommand = true;
-                else if (first.equals(CHECK_OPTION))
-                    this.isCheck = true;
-                else
-                    --i;
+                    break;
+                case BACKGROUND_OPTION:
+                    if (++i == args.length)
+                        argumentsError = "Color not provided";
+                    else {
+                        String color = args[i++];
+                        this.background = ColorString.getColor(color);
+                        if (this.background == null)
+                            argumentsError = "Invalid color:" + color;
+                    }
+                    break;
+                case FONT_OPTION:
+                    if (++i == args.length)
+                        argumentsError = "Font size not provided";
+                    else {
+                        String font = args[i++];
+                        try {
+                            this.fontSize = Integer.parseInt(font);
+                        } catch (NumberFormatException nfe) {
+                            argumentsError = "Invalid font size:" + font;
+                        }
+                    }
+                    break;
+                default:
+                    String first = args[i++];
+                    if (first.equals(COMMAND_OPTION))
+                        this.isCommand = true;
+                    else if (first.equals(CHECK_OPTION))
+                        this.isCheck = true;
+                    else
+                        --i;
 
-                if (i == args.length)
-                    argumentsError = "Script or command not provided";
-                else if (!this.isCommand && (i + 1 != args.length))
-                    argumentsError = "A script cannot be provided with arguments";
-                else {
-                    this.script = args[i++];
-                    while (i < args.length)
-                        this.script += " " + args[i++];
-                }
+                    if (i == args.length)
+                        argumentsError = "Script or command not provided";
+                    else if (!this.isCommand && (i + 1 != args.length))
+                        argumentsError = "A script cannot be provided with arguments";
+                    else {
+                        this.script = args[i++];
+                        while (i < args.length)
+                            this.script += " " + args[i++];
+                    }
+                    break;
             }
         }
     }
