@@ -8,20 +8,20 @@ import java.util.regex.Pattern;
 import net.coderazzi.cmdlinker.ScriptCommandException;
 import net.coderazzi.cmdlinker.ScriptProcessorListener;
 
-import net.coderazzi.cmdlinker.CmdLinker;
+import net.coderazzi.cmdlinker.gui.CmdLinker;
 
 /**
  * Command to accepts the font command line Font command line has syntax: font
- * [name [style]] size Where sizeis a number, and style is one of: plain, bold,
+ * [name [style]] size Where size is a number, and style is one of: plain, bold,
  * italic, bold&italic the font can have spaces, but then quotes must be used
  */
 public class ScriptFontCommand implements ScriptCommand {
-    private Pattern pattern = Pattern
+    private final Pattern pattern = Pattern
             .compile(
-                    "^(?:((?:\"[^\"]+\")|(?:\\w+))(?:\\s+([a-z]+))?\\s+)?(\\d+)$",
+                    "^(?:(\"[^\"]+\"|\\w+)(?:\\s+([a-z]+))?\\s+)?(\\d+)$",
                     Pattern.CASE_INSENSITIVE);
 
-    private HashMap<String, Integer> styles = new HashMap<String, Integer>();
+    private final HashMap<String, Integer> styles = new HashMap<>();
 
     public ScriptFontCommand() {
         styles.put("plain", Font.PLAIN);
@@ -48,13 +48,13 @@ public class ScriptFontCommand implements ScriptCommand {
 
     private Font getFont(String name, String style, String size)
             throws ScriptCommandException {
-        int s = Integer.valueOf(size);
+        int s = Integer.parseInt(size);
         int st = Font.PLAIN;
         if (style != null) {
             Integer v = styles.get(style.toLowerCase());
             if (v == null)
                 throw new ScriptCommandException("Invalid style: " + style);
-            st = v.intValue();
+            st = v;
         }
         if (name == null)
             name = CmdLinker.DEFAULT_FONT_FAMILY;

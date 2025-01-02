@@ -1,4 +1,4 @@
-package net.coderazzi.cmdlinker.candy;
+package net.coderazzi.cmdlinker.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -22,10 +22,10 @@ public class TabStatus {
 
     final static private Color TERMINATED = new Color(0x8b5a00);
 
-    private JPanel statusPanel;
-    private JLabel statusLabel;
+    private final JPanel statusPanel;
+    private final JLabel statusLabel;
     private JTabbedPane tabPane;
-    private JPanel owner;
+    private final JPanel owner;
     
     public TabStatus(final JPanel tab)
     {

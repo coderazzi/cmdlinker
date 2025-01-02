@@ -1,9 +1,7 @@
-package net.coderazzi.cmdlinker.candy;
+package net.coderazzi.cmdlinker.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -12,8 +10,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-
-import net.coderazzi.cmdlinker.CmdLinker;
 
 public class ProcessingScriptSplashScreen extends JDialog {
     public ProcessingScriptSplashScreen(final CmdLinker owner,
@@ -39,13 +35,11 @@ public class ProcessingScriptSplashScreen extends JDialog {
 
         JPanel buttonPanel = new JPanel(new BorderLayout());
         final JButton cancel = new JButton("Cancel");
-        cancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                cancel.setEnabled(false);
-                ProcessingScriptSplashScreen.this.setCursor(Cursor
-                        .getPredefinedCursor(Cursor.WAIT_CURSOR));
-                owner.abortScript(box.isEnabled());
-            }
+        cancel.addActionListener(arg0 -> {
+            cancel.setEnabled(false);
+            ProcessingScriptSplashScreen.this.setCursor(Cursor
+                    .getPredefinedCursor(Cursor.WAIT_CURSOR));
+            owner.abortScript(box.isEnabled());
         });
         buttonPanel.add(cancel, BorderLayout.EAST);
 

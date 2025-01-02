@@ -1,16 +1,11 @@
-package net.coderazzi.cmdlinker.candy;
+package net.coderazzi.cmdlinker.gui;
 
-import java.awt.event.ActionEvent;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JRootPane;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 public class EscapeDialog extends JDialog {
     protected EscapeDialog(JFrame parent, String title, boolean modal) {
@@ -18,11 +13,7 @@ public class EscapeDialog extends JDialog {
     }
 
     protected JRootPane createRootPane() {
-        ActionListener actionListener = new ActionListener() {
-            public void actionPerformed(ActionEvent actionEvent) {
-                setVisible(false);
-            }
-        };
+        ActionListener actionListener = actionEvent -> setVisible(false);
         KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
         JRootPane rootPane = new JRootPane();
         rootPane.registerKeyboardAction(actionListener, stroke,
@@ -39,6 +30,19 @@ public class EscapeDialog extends JDialog {
             }
         });
         return ret;
+    }
+
+    protected JPanel createButtonsPanel(JButton ok, JButton cancel) {
+        JPanel buttonsWrapper = new JPanel(new GridLayout(1, 2, 6, 6));
+        buttonsWrapper.add(ok);
+        buttonsWrapper.add(cancel);
+        buttonsWrapper
+                .setBorder(BorderFactory.createEmptyBorder(12, 0, 12, 12));
+
+        JPanel buttons = new JPanel(new BorderLayout());
+        buttons.add(buttonsWrapper, BorderLayout.EAST);
+
+        return buttons;
     }
 
 }

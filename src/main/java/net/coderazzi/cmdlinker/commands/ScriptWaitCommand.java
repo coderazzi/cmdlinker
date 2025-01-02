@@ -16,7 +16,7 @@ public class ScriptWaitCommand implements ScriptCommand {
     public void execute(ScriptProcessorListener target, String commandLine)
             throws ScriptCommandException {
         try {
-            target.waitTime(Long.valueOf(commandLine).longValue());
+            target.waitTime(Long.parseLong(commandLine));
         }catch (NumberFormatException e){
             throw new ScriptCommandException(
                     "Invalid wait parameter: " + commandLine);

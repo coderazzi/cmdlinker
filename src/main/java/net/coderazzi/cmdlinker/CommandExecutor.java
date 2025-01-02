@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 public class CommandExecutor {
-    public static enum ExecutionEnd {
+    public enum ExecutionEnd {
         Normal, ExceptionError, Terminated;
     }
 
@@ -20,7 +20,7 @@ public class CommandExecutor {
         void commandOutput(String line);
     }
 
-    private Client client;
+    private final Client client;
 
     private ProcessBuilder builder;
 
@@ -38,27 +38,22 @@ public class CommandExecutor {
     public synchronized void execute(final List<String> command) {
         assert !busy;
         busy = true;
-        new Thread(new Runnable() {
-            public void run() {
-                executeOnThisThread(command);
-            }
-        }).start();
+        new Thread(() -> executeOnThisThread(command)).start();
     }
 
     public synchronized void restart() {
         assert builder != null;
         terminate();
-        new Thread(new Runnable() {
-            public void run() {
-                synchronized (CommandExecutor.this) {
-                    while (busy)
-                        try {
-                            CommandExecutor.this.wait();
-                        } catch (InterruptedException ie) {
-                        }
-                }
-                executeOnThisThread(builder.command());
+        new Thread(() -> {
+            synchronized (CommandExecutor.this) {
+                while (busy)
+                    try {
+                        CommandExecutor.this.wait();
+                    } catch (InterruptedException ie) {
+                        break;
+                    }
             }
+            executeOnThisThread(builder.command());
         }).start();
     }
 
@@ -74,22 +69,19 @@ public class CommandExecutor {
         return busy;
     }
 
-    public synchronized boolean terminate() {
+    public synchronized void terminate() {
         // wait for the thread to start (if not yet started)
         while (busy && process == null)
             try {
                 wait();
             } catch (InterruptedException ie) {
+                break;
             }
-
-        boolean ret = busy;
 
         if (busy) {
             destroyed = true;
             process.destroy();
         }
-
-        return ret;
     }
 
     private void performExecution() {
@@ -132,9 +124,8 @@ public class CommandExecutor {
     }
 
     private boolean handleProcess(Process process) {
-        BufferedReader br = new BufferedReader(new InputStreamReader(process
-                .getInputStream()));
-        try {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(process
+                .getInputStream()))) {
             String line = br.readLine();
             while (line != null) {
                 client.commandOutput(line);
@@ -145,11 +136,6 @@ public class CommandExecutor {
             if (!destroyed)
                 client.errorOnCommand("Error executing " + describeProcess(),
                         ex.toString());
-        } finally {
-            try {
-                br.close();
-            } catch (IOException ex2) {
-            }
         }
         return false;
     }

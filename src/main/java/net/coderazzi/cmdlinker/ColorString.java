@@ -1,10 +1,10 @@
-package net.coderazzi.cmdlinker.candy;
+package net.coderazzi.cmdlinker;
 
 import java.awt.Color;
 import java.util.HashMap;
 
 public abstract class ColorString {
-    private static HashMap<String, Color> colors = new HashMap<String, Color>();
+    private static final HashMap<String, Color> colors = new HashMap<>();
 
     static {
         colors.put("black", Color.black);
@@ -31,8 +31,8 @@ public abstract class ColorString {
         try {
             return Color.decode(parameter);
         } catch (NumberFormatException nfe) {
+            return colors.get(parameter.toLowerCase());
         }
-        return colors.get(parameter.toLowerCase());
     }
 
 }

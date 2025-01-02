@@ -4,7 +4,7 @@ import net.coderazzi.cmdlinker.ScriptCommandException;
 import net.coderazzi.cmdlinker.ScriptProcessorListener;
 
 /**
- * Command to show an specific tab syntax: showTab [name|number]
+ * Command to show a specific tab syntax: showTab [name|number]
  */
 public class ScriptShowTabCommand implements ScriptCommand {
 

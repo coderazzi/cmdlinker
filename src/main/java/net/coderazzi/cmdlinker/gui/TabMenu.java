@@ -1,4 +1,4 @@
-package net.coderazzi.cmdlinker.candy;
+package net.coderazzi.cmdlinker.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,12 +11,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 
-import net.coderazzi.cmdlinker.Tab;
-
 public class TabMenu {
     private int stopItem;
 
-    private JPopupMenu popupMenu;
+    private final JPopupMenu popupMenu;
 
     private JMenuItem stopPopup, stopMenu;
 
@@ -42,7 +40,7 @@ public class TabMenu {
         stopPopup.setEnabled(enable);
     }
 
-    private JMenu createMenu(JMenu holder) {
+    private void createMenu(JMenu holder) {
         List<JMenuItem> items = createMenuItems();
         stopMenu = items.get(stopItem);
         for (JMenuItem item : items)
@@ -50,7 +48,6 @@ public class TabMenu {
                 holder.addSeparator();
             else
                 holder.add(item);
-        return holder;
     }
 
     private JPopupMenu createMenu(JPopupMenu holder) {
@@ -65,7 +62,7 @@ public class TabMenu {
     }
 
     private List<JMenuItem> createMenuItems() {
-        List<JMenuItem> ret = new ArrayList<JMenuItem>(13);
+        List<JMenuItem> ret = new ArrayList<>(13);
 
         JMenuItem item = new JMenuItem("Copy");
         item.addActionListener(copy);
@@ -120,45 +117,15 @@ public class TabMenu {
     }
 
     private void createActionListeners(final Tab owner) {
-        copy = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                owner.copyToClipboard();
-            }
-        };
-        clear = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                owner.clearTextArea();
-            }
-        };
-        search = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        copy = e -> owner.copyToClipboard();
+        clear = e -> owner.clearTextArea();
+        search = e -> {
 
-            }
         };
-        rename = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                owner.rename();
-            }
-        };
-        display = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                owner.changeDisplay();
-            }
-        };
-        restart = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                owner.restartCommand();
-            }
-        };
-        stop = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                owner.stopCommand();
-            }
-        };
-        close = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                owner.close();
-            }
-        };
+        rename = e -> owner.rename();
+        display = e -> owner.changeDisplay();
+        restart = e -> owner.restartCommand();
+        stop = e -> owner.stopCommand();
+        close = e -> owner.close();
     }
 }

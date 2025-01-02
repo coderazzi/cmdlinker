@@ -1,4 +1,4 @@
-package net.coderazzi.cmdlinker;
+package net.coderazzi.cmdlinker.gui;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -21,10 +21,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
-import net.coderazzi.cmdlinker.candy.DisplayDialog;
-import net.coderazzi.cmdlinker.candy.TabMenu;
-import net.coderazzi.cmdlinker.candy.TabOptions;
-import net.coderazzi.cmdlinker.candy.TabStatus;
+import net.coderazzi.cmdlinker.CommandExecutor;
 
 public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
     final static private int MAX_LINE_LENGTH_TO_CUT = 80;
@@ -37,23 +34,23 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
 
     private Document document;
     
-    private TabStatus status;
+    private final TabStatus status;
 
     private TabOptions tabOptions;
 
-    private TabCheckInfo checkInfo;
+    private final TabCheckInfo checkInfo;
 
-    private JPanel cards;
+    private final JPanel cards;
 
-    private StringBuilder buffer = new StringBuilder();
+    private final StringBuilder buffer = new StringBuilder();
 
-    private CmdLinker owner;
+    private final CmdLinker owner;
 
     private String name;
 
     private boolean autoScroll = true;
 
-    private TabMenu associatedMenu;
+    private final TabMenu associatedMenu;
 
     private CommandExecutor commandExecutor;
 
@@ -188,7 +185,7 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
      */
     public void copyToClipboard() {
         String selected = text.getSelectedText();
-        if (selected == null || selected.length() == 0)
+        if (selected == null || selected.isEmpty())
             selected = text.getText();
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(
                 new StringSelection(selected), null);
@@ -201,6 +198,7 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
         try {
             document.remove(0, document.getLength());
         } catch (BadLocationException bex) {
+            // sure
         }
     }
 
@@ -274,7 +272,8 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
                 }
                 document.remove(0, offset);
                 return offset;
-            } catch (BadLocationException blex) {
+            } catch (BadLocationException ex) {
+                // ok
             }
         }
         return 0;
@@ -303,13 +302,11 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
     }
 
     public void commandStarted(String process) {
-        executeSwingTask(new Runnable() {
-            public void run() {
-                clearTextArea();
-                status.setRunning();
-                associatedMenu.enableStopItem(true);
-                tabOptions.enableAutoScroll(true);
-            }
+        executeSwingTask(() -> {
+            clearTextArea();
+            status.setRunning();
+            associatedMenu.enableStopItem(true);
+            tabOptions.enableAutoScroll(true);
         });
     }
 
@@ -322,12 +319,10 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
 
     public void commandCompleted(final CommandExecutor.ExecutionEnd howEnded,
             final int errorCode) {
-        executeSwingTask(new Runnable() {
-            public void run() {
-                status.setEnded(howEnded, errorCode);
-                associatedMenu.enableStopItem(false);
-                tabOptions.enableAutoScroll(false);
-            }
+        executeSwingTask(() -> {
+            status.setEnded(howEnded, errorCode);
+            associatedMenu.enableStopItem(false);
+            tabOptions.enableAutoScroll(false);
         });
     }
 
@@ -343,8 +338,8 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
         else
             try {
                 SwingUtilities.invokeAndWait(runnable);
-            } catch (InterruptedException ie) {
-            } catch (InvocationTargetException ie) {
+            } catch (InterruptedException | InvocationTargetException ie) {
+                // what else to do.
             }
     }
 

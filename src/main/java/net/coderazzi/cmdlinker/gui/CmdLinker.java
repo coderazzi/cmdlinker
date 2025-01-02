@@ -1,4 +1,4 @@
-package net.coderazzi.cmdlinker;
+package net.coderazzi.cmdlinker.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -17,52 +17,33 @@ import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-import net.coderazzi.cmdlinker.candy.DisplayDialog;
-import net.coderazzi.cmdlinker.candy.IconLoader;
-import net.coderazzi.cmdlinker.candy.MainMenu;
-import net.coderazzi.cmdlinker.candy.OptionsHandler;
-import net.coderazzi.cmdlinker.candy.ProcessingScriptSplashScreen;
-import net.coderazzi.cmdlinker.candy.RunCommandDialog;
-import net.coderazzi.cmdlinker.candy.RunScriptDialog;
+import net.coderazzi.cmdlinker.ScriptCommandException;
+import net.coderazzi.cmdlinker.ScriptProcessor;
+import net.coderazzi.cmdlinker.ScriptProcessorListener;
+import net.coderazzi.cmdlinker.Version;
 
 public class CmdLinker extends JFrame implements ScriptProcessorListener {
     public final static String DEFAULT_FONT_FAMILY = "Monospaced";
 
+    private final List<Tab> tabs = new ArrayList<>();
+    private final ScriptProcessor scriptProcessor;
+    private final MainMenu menuBar;
+
     private JTabbedPane tabsPane;
-
-    private List<Tab> tabs = new ArrayList<Tab>();
-
-    private ScriptProcessor scriptProcessor;
-
     private Tab currentScriptTab;
-
-    private MainMenu menuBar;
-
     private ProcessingScriptSplashScreen splashScreen;
-
     private Font font, backupFont;
-
     private Color foreground, background, backupFg, backupBg;
-
     private boolean autoScroll = true, currentTabAvailable, checkingCommand;
-
     private transient boolean aborted, revertChangesIfAborted;
-
     private int firstScriptTab;
-
     private String lastScript, lastCommand;
-
     private RunScriptDialog runScriptDialog;
-
     private RunCommandDialog runCommandDialog;
-
     private OptionsHandler optionsHandler;
-
-    private Pattern commandSeparatorPattern = Pattern
-            .compile("^(?:(?:\"(((?:\\\\.)|(?:[^\\\\\"]))*)\")|([^\"][^\\s]*))\\s*(.*)$");
+    private final Pattern separatorPattern = Pattern
+            .compile("^(?:\"((\\\\.|[^\\\\\"])*)\"|([^\"]\\S*))\\s*(.*)$");
 
     public CmdLinker() {
         super("Cmd Linker");
@@ -90,15 +71,13 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
             }
         });
 
-        tabsPane.addChangeListener(new ChangeListener() {
-            public void stateChanged(ChangeEvent e) {
-                int index = tabsPane.getSelectedIndex();
-                Tab tab = null;
-                if (index != -1) {
-                    tab = tabs.get(index);
-                }
-                menuBar.setTabMenu(tab);
+        tabsPane.addChangeListener(e -> {
+            int index = tabsPane.getSelectedIndex();
+            Tab tab = null;
+            if (index != -1) {
+                tab = tabs.get(index);
             }
+            menuBar.setTabMenu(tab);
         });
     }
 
@@ -121,10 +100,6 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
         menuBar.setOptionsHandler(optionsHandler);
         runScriptDialog = new RunScriptDialog(this, optionsHandler);
         runCommandDialog = new RunCommandDialog(this, optionsHandler);
-    }
-
-    public OptionsHandler getOptionsHandler() {
-        return optionsHandler;
     }
 
     /**
@@ -277,7 +252,7 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
     }
 
     public void closeAllConsoles() {
-        while (tabs.size() > 0)
+        while (!tabs.isEmpty())
             tabs.get(0).close();
     }
 
@@ -323,80 +298,81 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
         else
             try {
                 SwingUtilities.invokeAndWait(runnable);
-            } catch (InterruptedException ie) {
-            } catch (InvocationTargetException ie) {
+            } catch (InterruptedException | InvocationTargetException ie) {
+                //nothing to do
             }
     }
 
     private List<String> parseExecutable(String executionParameters)
             throws ScriptCommandException {
-        List<String> ret = new ArrayList<String>();
-        String handling = executionParameters;
-        Matcher m = commandSeparatorPattern.matcher(handling);
+        List<String> ret = new ArrayList<>();
+        String parameters = executionParameters;
+        Matcher m = separatorPattern.matcher(parameters);
         while (m.matches()) {
             if (m.group(1) != null)
                 ret.add(m.group(1));
             else
                 ret.add(m.group(3));
-            handling = m.group(4);
-            m = commandSeparatorPattern.matcher(handling);
+            parameters = m.group(4);
+            m = separatorPattern.matcher(parameters);
         }
-        if (handling.trim().length() > 0)
+        System.out.println("Execution of " + ret.size());
+        for (String s : ret) {
+            System.out.println(s);
+        }
+        if (!parameters.trim().isEmpty())
             throw new ScriptCommandException("Could not parse command >"
                     + executionParameters);
         return ret;
     }
 
-    /** S C R I P T P R O C E S S O R L I S T E N E R INTERFACE * */
-
     /**
      * ScriptProcessorListener interface
      */
     public void scriptProcessed(String scriptName) {
-        executeSwingTask(new Runnable() {
-            public void run() {
-                splashScreen.setVisible(false);
-                splashScreen = null;
-                if (currentScriptTab != null && currentTabAvailable) {
-                    if (!aborted)
-                        JOptionPane
-                                .showMessageDialog(
-                                        CmdLinker.this,
-                                        "Every created tab must have an associated task",
-                                        "Script error",
-                                        JOptionPane.ERROR_MESSAGE);
-                    currentScriptTab.close();
-                }
-                if (aborted && revertChangesIfAborted) {
-                    while (tabs.size() > firstScriptTab) {
-                        tabs.get(tabs.size() - 1).close();
-                    }
-                } else {
-                    if (tabsPane.getSelectedIndex() < firstScriptTab
-                            && tabsPane.getTabCount() >= firstScriptTab) {
-                        tabsPane.setSelectedIndex(firstScriptTab);
-                    }
-                }
-                currentScriptTab = null;
-                foreground = backupFg;
-                background = backupBg;
-                font = backupFont;
-                menuBar.enableRunLastScript(!checkingCommand);
-                checkingCommand = false;
+        executeSwingTask(() -> {
+            splashScreen.setVisible(false);
+            splashScreen = null;
+            if (currentScriptTab != null && currentTabAvailable) {
+                if (!aborted)
+                    JOptionPane
+                            .showMessageDialog(
+                                    CmdLinker.this,
+                                    "Every created tab must have an associated task",
+                                    "Script error",
+                                    JOptionPane.ERROR_MESSAGE);
+                currentScriptTab.close();
             }
+            if (aborted && revertChangesIfAborted) {
+                while (tabs.size() > firstScriptTab) {
+                    tabs.get(tabs.size() - 1).close();
+                }
+            } else {
+                if (tabsPane.getSelectedIndex() < firstScriptTab
+                        && tabsPane.getTabCount() >= firstScriptTab) {
+                    tabsPane.setSelectedIndex(firstScriptTab);
+                }
+            }
+            currentScriptTab = null;
+            foreground = backupFg;
+            background = backupBg;
+            font = backupFont;
+            menuBar.enableRunLastScript(!checkingCommand);
+            checkingCommand = false;
         });
     }
 
     /**
      * ScriptProcessorListener interface
      */
-    public void waitTime(long milliseconds) throws ScriptCommandException {
+    public void waitTime(long milliseconds) {
         if (!checkingCommand) {
             long finalTime = System.currentTimeMillis() + milliseconds;
             while (System.currentTimeMillis() < finalTime && !aborted) {
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException ie) {
+                    break;
                 }
             }
         }
@@ -406,10 +382,10 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
      * ScriptProcessorListener interface
      */
     public void execute(String command) throws ScriptCommandException {
-        List<String> splittedCommand = parseExecutable(command);
+        List<String> splitCommand = parseExecutable(command);
         boolean createTab = !currentTabAvailable;
         currentTabAvailable = false;
-        executeSwingTask(new TabExecutor(command, splittedCommand, createTab));
+        executeSwingTask(new TabExecutor(command, splitCommand, createTab));
     }
 
     /**
@@ -427,12 +403,9 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
      * ScriptProcessorListener interface
      */
     public synchronized void scriptProcessingError(final String error) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                JOptionPane.showMessageDialog(CmdLinker.this, error, "Script Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
+                CmdLinker.this, error, "Script Error",
+                JOptionPane.ERROR_MESSAGE));
     }
 
     /**
@@ -469,7 +442,8 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
      * **************************************************************************
      */
     class ColorsSetter implements Runnable {
-        Color foregColor, backColor;
+        final Color foregColor;
+        final Color backColor;
 
         public ColorsSetter(Color foregColor, Color backColor) {
             this.foregColor = foregColor;
@@ -494,7 +468,7 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
      * **************************************************************************
      */
     class FontSetter implements Runnable {
-        Font fnt;
+        final Font fnt;
 
         public FontSetter(Font font) {
             this.fnt = font;
@@ -514,7 +488,7 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
      * **************************************************************************
      */
     class ScrollSetter implements Runnable {
-        boolean scroll;
+        final boolean scroll;
 
         public ScrollSetter(boolean scroll) {
             this.scroll = scroll;
@@ -560,24 +534,22 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
      * **************************************************************************
      */
     class TabExecutor implements Runnable {
-        String command;
+        final String command;
+        final List<String> split;
+        final boolean createTab;
 
-        List<String> splittedCommand;
-
-        boolean createTab;
-
-        public TabExecutor(String command, List<String> splittedCommand,
+        public TabExecutor(String command, List<String> split,
                 boolean createTab) {
             this.command = command;
             this.createTab = createTab;
-            this.splittedCommand = splittedCommand;
+            this.split = split;
         }
 
         public void run() {
-            String name = extractTabName(splittedCommand.get(0));
+            String name = extractTabName(split.get(0));
             if (createTab) {
                 new TabCreator(name).run();
-            } else if (name != null && currentScriptTab.getName() == null) {
+            } else if (currentScriptTab.getName() == null) {
                 currentScriptTab.setName(name);
                 tabsPane.setTitleAt(tabs.size() - 1, name);
             }
@@ -585,7 +557,7 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
             if (checkingCommand) {
                 currentScriptTab.showCheckInfo(command);
             } else {
-                currentScriptTab.process(splittedCommand);
+                currentScriptTab.process(split);
             }
         }
 
@@ -606,7 +578,7 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
      * **************************************************************************
      */
     class TabShower implements Runnable {
-        String name;
+        final String name;
 
         public TabShower(String name) {
             this.name = name;
@@ -620,7 +592,7 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
                                 JOptionPane.ERROR_MESSAGE);
                 return -1;
             }
-            if (name.length() == 0) {
+            if (name.isEmpty()) {
                 return tabs.size() - 1;
             }
             for (int i = firstScriptTab; i < tabs.size(); i++) {
@@ -630,8 +602,9 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
             }
             int index = -1;
             try {
-                index = firstScriptTab + Integer.valueOf(name).intValue() - 1;
+                index = firstScriptTab + Integer.parseInt(name) - 1;
             } catch (NumberFormatException ne) {
+                // index remains -1
             }
             if (index < 0 || index >= tabs.size()) {
                 JOptionPane.showMessageDialog(CmdLinker.this, "showTab",
@@ -649,9 +622,7 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
         }
     }
 
-    /** M  A  I  N **/
-
-    public final static void main(String[] args) throws Exception {
+    public static void main(String[] args)  {
         System.out.println(Version.getVersion());
         OptionsHandler arguments = OptionsHandler.createOptionsHandler(args);
         String argumentsError = arguments.getInitialArgumentsStringError();

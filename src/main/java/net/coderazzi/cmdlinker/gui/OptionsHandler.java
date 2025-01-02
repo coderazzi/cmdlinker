@@ -1,4 +1,6 @@
-package net.coderazzi.cmdlinker.candy;
+package net.coderazzi.cmdlinker.gui;
+
+import net.coderazzi.cmdlinker.ColorString;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -14,8 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
-import net.coderazzi.cmdlinker.CmdLinker;
 
 public class OptionsHandler {
     private final static String HELP_OPTION = "-help";
@@ -68,7 +68,7 @@ public class OptionsHandler {
 
     private String argumentsError;
 
-    private List<CmdLinker> clients = new ArrayList<CmdLinker>();
+    private final List<CmdLinker> clients = new ArrayList<>();
 
     static public OptionsHandler createOptionsHandler(String[] args) {
         OptionsHandler oh = new OptionsHandler();
@@ -149,7 +149,7 @@ public class OptionsHandler {
 
             public void windowClosed(WindowEvent e) {
                 clients.remove(client);
-                if (clients.size() == 0) {
+                if (clients.isEmpty()) {
                     if (usingPersistence)
                         savePropertiesFile();
                     else
@@ -228,8 +228,9 @@ public class OptionsHandler {
     private int getIntProperty(String value) {
         if (value != null)
             try {
-                return Integer.valueOf(value).intValue();
+                return Integer.parseInt(value);
             } catch (NumberFormatException nf) {
+                // will just return -1
             }
         return -1;
     }
@@ -242,11 +243,8 @@ public class OptionsHandler {
 
     private void savePropertiesFile() {
         try {
-            FileOutputStream fos = new FileOutputStream(getPropertyFile());
-            try {
+            try (FileOutputStream fos = new FileOutputStream(getPropertyFile())) {
                 encodeProperties().store(fos, "CmdLinker configuration file");
-            } finally {
-                fos.close();
             }
         } catch (IOException ex) {
             System.out.println("Sorry, problem while storing options");
@@ -255,15 +253,13 @@ public class OptionsHandler {
 
     private void readPropertiesFile() {
         try {
-            FileInputStream fis = new FileInputStream(getPropertyFile());
-            try {
+            try (FileInputStream fis = new FileInputStream(getPropertyFile())) {
                 Properties props = new Properties();
                 props.load(fis);
                 decodeProperties(props);
-            } finally {
-                fis.close();
             }
         } catch (IOException ex) {
+            // do nothing if it cannot be read
         }
     }
 
@@ -300,7 +296,7 @@ public class OptionsHandler {
                 else {
                     String font = args[i++];
                     try {
-                        this.fontSize = Integer.valueOf(font).intValue();
+                        this.fontSize = Integer.parseInt(font);
                     } catch (NumberFormatException nfe) {
                         argumentsError = "Invalid font size:" + font;
                     }

@@ -1,4 +1,4 @@
-package net.coderazzi.cmdlinker;
+package net.coderazzi.cmdlinker.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -12,9 +12,11 @@ import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 
 public class TabCheckInfo extends JPanel {
-    private JLabel checkInfoCommand, info1, info2;
+    private final JLabel checkInfoCommand;
+    private final JLabel info1;
+    private final JLabel info2;
 
-    private JPanel checkInfo;
+    private final JPanel checkInfo;
 
     public TabCheckInfo() {
         super(new BorderLayout());

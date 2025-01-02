@@ -7,16 +7,16 @@ import java.util.regex.Pattern;
 import net.coderazzi.cmdlinker.ScriptCommandException;
 import net.coderazzi.cmdlinker.ScriptProcessorListener;
 
-import net.coderazzi.cmdlinker.candy.ColorString;
+import net.coderazzi.cmdlinker.ColorString;
 
 /**
  * Command to accepts the color command line Color command line has syntax:
  * color foreground background Where each color is one of: -well known color:
- * black, white, etc. -RGB color, preceeded by 0x or #. The color is then given
+ * black, white, etc. -RGB color, preceded by 0x or #. The color is then given
  * with 3 or 6 digits
  */
 public class ScriptColorsCommand implements ScriptCommand {
-    private Pattern pattern = Pattern.compile("^(\\S+)\\s+(\\S+)$",
+    private final Pattern pattern = Pattern.compile("^(\\S+)\\s+(\\S+)$",
             Pattern.CASE_INSENSITIVE);
 
     @Override

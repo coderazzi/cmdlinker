@@ -1,14 +1,10 @@
-package net.coderazzi.cmdlinker.candy;
+package net.coderazzi.cmdlinker.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Random;
@@ -23,9 +19,7 @@ import javax.swing.JTextArea;
 
 public class DisplayDialog extends EscapeDialog {
     private Font font;
-
     private Color foreground, background;
-
     private boolean okPressed;
 
     public DisplayDialog(JFrame parent, Color foreground, Color background,
@@ -79,33 +73,27 @@ public class DisplayDialog extends EscapeDialog {
                 .createEmptyBorder(6, 6, 6, 6)));
 
         JButton bgButton = createAutoEnterButton("Background");
-        bgButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                background = changeColor("background", background);
-                area.setBackground(background);
-            }
+        bgButton.addActionListener(e -> {
+            background = changeColor("background", background);
+            area.setBackground(background);
         });
         JButton fgButton = createAutoEnterButton("Foreground");
-        fgButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                foreground = changeColor("foreground", foreground);
-                area.setForeground(foreground);
-            }
+        fgButton.addActionListener(e -> {
+            foreground = changeColor("foreground", foreground);
+            area.setForeground(foreground);
         });
         final JComboBox<Integer> fonts = createFontsCombobox();
-        fonts.setSelectedItem(new Integer(font.getSize()));
+        fonts.setSelectedItem(font.getSize());
         fonts.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER)
                     okPressed();
             }
         });
-        fonts.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                font = font.deriveFont(((Integer) fonts.getSelectedItem())
-                        .floatValue());
-                area.setFont(font);
-            }
+        fonts.addItemListener(e -> {
+            font = font.deriveFont(((Integer) fonts.getSelectedItem())
+                    .floatValue());
+            area.setFont(font);
         });
 
         JPanel fontPanel = new JPanel(new BorderLayout());
@@ -138,32 +126,19 @@ public class DisplayDialog extends EscapeDialog {
                         BorderFactory.createEmptyBorder(6, 6, 6, 6))));
 
         JButton cancel = createAutoEnterButton("Cancel");
-        cancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                okPressed = false;
-                setVisible(false);
-            }
+        cancel.addActionListener(e -> {
+            okPressed = false;
+            setVisible(false);
         });
         JButton ok = createAutoEnterButton("Ok");
-        ok.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                okPressed = true;
-                setVisible(false);
-            }
+        ok.addActionListener(e -> {
+            okPressed = true;
+            setVisible(false);
         });
-
-        JPanel buttonsWrapper = new JPanel(new GridLayout(1, 2, 6, 6));
-        buttonsWrapper.add(ok);
-        buttonsWrapper.add(cancel);
-        buttonsWrapper
-                .setBorder(BorderFactory.createEmptyBorder(12, 0, 12, 12));
-
-        JPanel buttons = new JPanel(new BorderLayout());
-        buttons.add(buttonsWrapper, BorderLayout.EAST);
 
         JPanel content = new JPanel(new BorderLayout());
         content.add(colors, BorderLayout.CENTER);
-        content.add(buttons, BorderLayout.SOUTH);
+        content.add(createButtonsPanel(ok, cancel), BorderLayout.SOUTH);
 
         return content;
     }
@@ -181,14 +156,14 @@ public class DisplayDialog extends EscapeDialog {
     }
 
     public static JComboBox<Integer> createFontsCombobox() {
-        JComboBox<Integer> ret = new JComboBox<Integer>(getFontSizes());
+        JComboBox<Integer> ret = new JComboBox<>(getFontSizes());
         ret.setEditable(false);
         return ret;
     }
 
     private static Integer[] getFontSizes() {
         int start = 6, end = 72;
-        Integer ret[] = new Integer[end - start + 1];
+        Integer []ret = new Integer[end - start + 1];
         for (int i = start; i <= end; i++)
             ret[i - start] = i;
         return ret;

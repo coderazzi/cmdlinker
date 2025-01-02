@@ -9,7 +9,7 @@
   <version>0.9.8</version>
   <name>cmdlinker</name>
   <properties>
-          <exec.mainClass>net.coderazzi.cmdlinker.CmdLinker</exec.mainClass>
+          <exec.mainClass>net.coderazzi.cmdlinker.gui.CmdLinker</exec.mainClass>
   </properties>
   <build>
     <plugins>

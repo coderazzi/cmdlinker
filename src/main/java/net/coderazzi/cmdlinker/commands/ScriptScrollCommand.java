@@ -1,6 +1,5 @@
 package net.coderazzi.cmdlinker.commands;
 
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,7 +11,7 @@ import net.coderazzi.cmdlinker.ScriptProcessorListener;
  * scroll on|auto|lock|off
  */
 public class ScriptScrollCommand implements ScriptCommand {
-    private Pattern pattern = Pattern.compile("^(on|off)$",
+    private final Pattern pattern = Pattern.compile("^(on|off)$",
             Pattern.CASE_INSENSITIVE);
 
     @Override

@@ -1,9 +1,10 @@
 package net.coderazzi.cmdlinker;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 import net.coderazzi.cmdlinker.commands.ScriptColorsCommand;
@@ -16,11 +17,11 @@ import net.coderazzi.cmdlinker.commands.ScriptShowTabCommand;
 import net.coderazzi.cmdlinker.commands.ScriptWaitCommand;
 
 public class ScriptProcessor implements Runnable {
-    private ScriptProcessorListener owner;
+    private final ScriptProcessorListener owner;
 
     private String file;
 
-    private HashMap<String, ScriptCommand> commands = new HashMap<String, ScriptCommand>();
+    private final HashMap<String, ScriptCommand> commands = new HashMap<>();
 
     private transient boolean aborted;
 
@@ -45,6 +46,7 @@ public class ScriptProcessor implements Runnable {
             try {
                 wait();
             } catch (InterruptedException ie) {
+                break;
             }
         this.file = scriptFile;
         new Thread(this).start();
@@ -71,9 +73,8 @@ public class ScriptProcessor implements Runnable {
     }
 
     public void processFile(String file) throws IOException {
-        LineNumberReader reader = new LineNumberReader(new InputStreamReader(
-                new FileInputStream(file)));
-        try {
+        try (LineNumberReader reader = new LineNumberReader(new InputStreamReader(
+                Files.newInputStream(Paths.get(file))))) {
             String line = reader.readLine();
             try {
                 while (!aborted && (line != null)) {
@@ -82,10 +83,9 @@ public class ScriptProcessor implements Runnable {
                 }
             } catch (ScriptCommandException sex) {
                 owner.scriptProcessingError(
-                    "<html>" + file + ":" + reader.getLineNumber() + "<br>" + sex.getMessage() + "</html>");
+                        "<html>" + file + ":" + reader.getLineNumber() + "<br>" + sex.getMessage() + "</html>");
             }
         } finally {
-            reader.close();
             synchronized (this) {
                 this.file = null;
                 notifyAll();
@@ -94,7 +94,7 @@ public class ScriptProcessor implements Runnable {
     }
 
     private void processLine(String line) throws ScriptCommandException {
-        if (line.length() > 0 && line.charAt(0) != '#') {
+        if (!line.isEmpty() && line.charAt(0) != '#') {
             int space = line.indexOf(' ');
             if (space != -1) {
                 String command = line.substring(0, space);
