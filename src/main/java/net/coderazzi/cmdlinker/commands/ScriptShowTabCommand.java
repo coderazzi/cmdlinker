@@ -6,16 +6,17 @@ import net.coderazzi.cmdlinker.ScriptProcessorListener;
 /**
  * Command to show an specific tab syntax: showTab [name|number]
  */
-public class ScriptShowTabCommand extends ScriptCommand {
-    public ScriptShowTabCommand() {
-        super("showTab");
+public class ScriptShowTabCommand implements ScriptCommand {
+
+    @Override
+    public String getCommand() {
+        return "SHOW";
     }
 
     @Override
     public void execute(ScriptProcessorListener target, String commandLine)
             throws ScriptCommandException {
-        String rest = commandLine.substring(getCommand().length()).trim();
-        target.showTab(getUnquotedString(rest));
+        target.showTab(commandLine);
     }
 
 }

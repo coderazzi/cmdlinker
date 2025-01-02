@@ -426,11 +426,10 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
     /**
      * ScriptProcessorListener interface
      */
-    public synchronized void scriptProcessingError(final String fileName,
-            final String error) {
+    public synchronized void scriptProcessingError(final String error) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                JOptionPane.showMessageDialog(CmdLinker.this, fileName, error,
+                JOptionPane.showMessageDialog(CmdLinker.this, error, "Script Error",
                         JOptionPane.ERROR_MESSAGE);
             }
         });

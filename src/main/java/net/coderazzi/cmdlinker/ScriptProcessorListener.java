@@ -20,7 +20,7 @@ public interface ScriptProcessorListener {
      * this method, nothing else is called This method is always called from a
      * separate thread.
      */
-    public void scriptProcessingError(String fileName, String error);
+    public void scriptProcessingError(String error);
 
     /**
      * Method called to set the color of all or the most recent created tab This

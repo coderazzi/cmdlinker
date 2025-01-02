@@ -11,18 +11,13 @@ import net.coderazzi.cmdlinker.ScriptProcessorListener;
  * Command to accepts the scroll command line Scroll command line has syntax:
  * scroll on|auto|lock|off
  */
-public class ScriptScrollCommand extends ScriptCommand {
-    private Pattern pattern = Pattern.compile("^scroll\\s+([a-z]+)$",
+public class ScriptScrollCommand implements ScriptCommand {
+    private Pattern pattern = Pattern.compile("^(on|off)$",
             Pattern.CASE_INSENSITIVE);
 
-    private HashMap<String, Boolean> pars = new HashMap<String, Boolean>();
-
-    public ScriptScrollCommand() {
-        super("scroll");
-        pars.put("on", true);
-        pars.put("off", false);
-        pars.put("auto", true);
-        pars.put("lock", false);
+    @Override
+    public String getCommand() {
+        return "SCROLL";
     }
 
     @Override
@@ -31,15 +26,8 @@ public class ScriptScrollCommand extends ScriptCommand {
         Matcher match = pattern.matcher(commandLine);
         if (!match.matches())
             throw new ScriptCommandException(
-                    "Invalid scroll syntax: scroll on|auto|lock|off");
-        target.setAutoScroll(getAutoScroll(match.group(1)));
-    }
-
-    private boolean getAutoScroll(String par) throws ScriptCommandException {
-        Boolean v = pars.get(par);
-        if (v == null)
-            throw new ScriptCommandException("Invalid scroll parameter: " + par);
-        return v.booleanValue();
+                    "<html>Invalid scroll syntax<br>SCROLL on|off</html>");
+        target.setAutoScroll(match.group(1).equals("on"));
     }
 
 }

@@ -15,20 +15,24 @@ import net.coderazzi.cmdlinker.CmdLinker;
  * [name [style]] size Where sizeis a number, and style is one of: plain, bold,
  * italic, bold&italic the font can have spaces, but then quotes must be used
  */
-public class ScriptFontCommand extends ScriptCommand {
+public class ScriptFontCommand implements ScriptCommand {
     private Pattern pattern = Pattern
             .compile(
-                    "^font\\s+(?:((?:\"[^\"]+\")|(?:\\w+))(?:\\s+([a-z]+))?\\s+)?(\\d+)$",
+                    "^(?:((?:\"[^\"]+\")|(?:\\w+))(?:\\s+([a-z]+))?\\s+)?(\\d+)$",
                     Pattern.CASE_INSENSITIVE);
 
     private HashMap<String, Integer> styles = new HashMap<String, Integer>();
 
     public ScriptFontCommand() {
-        super("font");
         styles.put("plain", Font.PLAIN);
         styles.put("bold", Font.BOLD);
         styles.put("italic", Font.ITALIC);
         styles.put("bold&italic", Font.BOLD | Font.ITALIC);
+    }
+
+    @Override
+    public String getCommand() {
+        return "FONT";
     }
 
     @Override
@@ -37,7 +41,7 @@ public class ScriptFontCommand extends ScriptCommand {
         Matcher match = pattern.matcher(commandLine);
         if (!match.matches())
             throw new ScriptCommandException(
-                    "Invalid font syntax: font [name [style]] size");
+                    "<<html>Invalid font syntax<br>FONT [name [style]] size</html>");
         target.setTextFont(getFont(match.group(1), match.group(2), match
                 .group(3)));
     }

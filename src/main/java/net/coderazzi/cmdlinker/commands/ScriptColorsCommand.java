@@ -15,12 +15,13 @@ import net.coderazzi.cmdlinker.candy.ColorString;
  * black, white, etc. -RGB color, preceeded by 0x or #. The color is then given
  * with 3 or 6 digits
  */
-public class ScriptColorsCommand extends ScriptCommand {
-    private Pattern pattern = Pattern.compile("^colors\\s+(\\w+)\\s+(\\w+)$",
+public class ScriptColorsCommand implements ScriptCommand {
+    private Pattern pattern = Pattern.compile("^(\\S+)\\s+(\\S+)$",
             Pattern.CASE_INSENSITIVE);
 
-    public ScriptColorsCommand() {
-        super("colors");
+    @Override
+    public String getCommand() {
+        return "COLORS";
     }
 
     @Override
@@ -29,7 +30,7 @@ public class ScriptColorsCommand extends ScriptCommand {
         Matcher match = pattern.matcher(commandLine);
         if (!match.matches())
             throw new ScriptCommandException(
-                    "Invalid colors syntax: colors foreground background");
+                    "<html>Invalid colors syntax<br>COLORS foreground background</html>");
         target.setColors(getColor(match.group(1)), getColor(match.group(2)));
     }
 

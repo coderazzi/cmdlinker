@@ -22,14 +22,11 @@ public class ScriptProcessor implements Runnable {
 
     private HashMap<String, ScriptCommand> commands = new HashMap<String, ScriptCommand>();
 
-    private ScriptCommand defaultScriptCommand;
-
     private transient boolean aborted;
 
     public ScriptProcessor(ScriptProcessorListener owner) {
         this.owner = owner;
-        defaultScriptCommand = new ScriptExecuteCommand();
-        addCommand(defaultScriptCommand);
+        addCommand(new ScriptExecuteCommand());
         addCommand(new ScriptColorsCommand());
         addCommand(new ScriptCreateTabCommand());
         addCommand(new ScriptFontCommand());
@@ -68,7 +65,7 @@ public class ScriptProcessor implements Runnable {
         try {
             processFile(file);
         } catch (IOException ex) {
-            owner.scriptProcessingError(file, "Could not read given file");
+            owner.scriptProcessingError("Could not read file " + file);
         }
         owner.scriptProcessed(file);
     }
@@ -85,7 +82,7 @@ public class ScriptProcessor implements Runnable {
                 }
             } catch (ScriptCommandException sex) {
                 owner.scriptProcessingError(
-                        file + ":" + reader.getLineNumber(), sex.getMessage());
+                    "<html>" + file + ":" + reader.getLineNumber() + "<br>" + sex.getMessage() + "</html>");
             }
         } finally {
             reader.close();
@@ -98,16 +95,18 @@ public class ScriptProcessor implements Runnable {
 
     private void processLine(String line) throws ScriptCommandException {
         if (line.length() > 0 && line.charAt(0) != '#') {
-            ScriptCommand command = commands
-                    .get(getCommand(line).toLowerCase());
-            if (command == null)
-                command = defaultScriptCommand;
-            command.execute(owner, line);
+            int space = line.indexOf(' ');
+            if (space != -1) {
+                String command = line.substring(0, space);
+                ScriptCommand sc = commands.get(command);
+                if (sc != null) {
+                    sc.execute(owner, line.substring(space + 1).trim());
+                    return;
+                }                
+                line = command;
+            }
+            throw new ScriptCommandException("Unknown command: " + line);
         }
     }
 
-    private String getCommand(String line) {
-        int space = line.indexOf(' ');
-        return space == -1 ? line : line.substring(0, space);
-    }
 }

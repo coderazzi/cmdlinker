@@ -3,27 +3,10 @@ package net.coderazzi.cmdlinker.commands;
 import net.coderazzi.cmdlinker.ScriptCommandException;
 import net.coderazzi.cmdlinker.ScriptProcessorListener;
 
-public abstract class ScriptCommand {
-    private String command;
+public interface ScriptCommand {
+    String getCommand();
 
-    public ScriptCommand(String command) {
-        this.command = command.toLowerCase();
-    }
+    void execute(ScriptProcessorListener target, String commandLine) 
+        throws ScriptCommandException;
 
-    public String getCommand() {
-        return command;
-    }
-
-    public abstract void execute(ScriptProcessorListener target,
-            String commandLine) throws ScriptCommandException;
-
-    protected String getUnquotedString(String s) {
-        if (s != null) {
-            if (s.length() > 1 && s.charAt(0) == '"'
-                    && s.charAt(s.length() - 1) == '"') {
-                s = s.substring(1, s.length() - 1);
-            }
-        }
-        return s;
-    }
 }
