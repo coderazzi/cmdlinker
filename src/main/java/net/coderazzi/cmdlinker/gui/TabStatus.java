@@ -15,11 +15,8 @@ import net.coderazzi.cmdlinker.CommandExecutor;
 public class TabStatus {
     
     final static private Color WELL_COMPLETED = new Color(0x008b45);
-
     final static private Color NON_ZERO_ERROR_CODE = new Color(0x27408b);
-
     final static private Color ERROR_ON_COMMAND = new Color(0x8b1a1a);
-
     final static private Color TERMINATED = new Color(0x8b5a00);
 
     private final JPanel statusPanel;

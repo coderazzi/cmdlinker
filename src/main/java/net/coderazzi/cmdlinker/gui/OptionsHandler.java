@@ -1,5 +1,6 @@
 package net.coderazzi.cmdlinker.gui;
 
+import net.coderazzi.cmdlinker.Appearance;
 import net.coderazzi.cmdlinker.ColorString;
 
 import java.awt.Color;
@@ -19,56 +20,30 @@ import java.util.Properties;
 
 public class OptionsHandler {
     private final static String HELP_OPTION = "-help";
-
-    private final static String CHECK_OPTION = "-check";
-
     private final static String COMMAND_OPTION = "-c";
-
     private final static String FOREGROUND_OPTION = "-fg";
-
     private final static String BACKGROUND_OPTION = "-bg";
-
     private final static String FONT_OPTION = "-font";
-
     private static final String PROP_BACKGROUND = "bgColor";
-
     private static final String PROP_FOREGROUND = "fgColor";
-
     private static final String PROP_FONT = "fontSize";
-
     private static final String PROP_SCRIPT = "script";
-
     private static final String PROP_COMMAND = "command";
-
     private static final String PROP_COMMAND_DIR = "commandDir";
-
     private static final String PROP_X = "x";
-
     private static final String PROP_Y = "y";
-
     private static final String PROP_W = "w";
-
     private static final String PROP_H = "h";
 
-    private Color background, foreground;
-
-    private int fontSize;
-
+    private Appearance appearance = new Appearance();
     private String lastScript, lastCommand, lastCommandDir;
-
     private int x = -1, y = -1, w = -1, h = -1;
-
     private boolean usingPersistence;
-
-    private boolean isCommand = false;
-
-    private boolean isCheck = false;
-
-    private String script;
-
+    private boolean parameterCommand = false;
+    private String parameterScript;
     private String argumentsError;
 
-    private final List<CmdLinker> clients = new ArrayList<>();
+    private final List<CmdLinker> windows = new ArrayList<>();
 
     static public OptionsHandler createOptionsHandler(String[] args) {
         OptionsHandler oh = new OptionsHandler();
@@ -80,13 +55,12 @@ public class OptionsHandler {
         return argumentsError;
     }
 
-    public void setDisplayProperties(Color foreground, Color background,
-            int fontSize) {
-        if (foreground != null)
-            this.foreground = foreground;
-        if (background != null)
-            this.background = background;
-        this.fontSize = fontSize;
+    public void setAppearance(Appearance appearance) {
+        this.appearance = appearance;
+    }
+
+    public Appearance getAppearance() {
+        return appearance;
     }
 
     public String getLastCommandDirectory() {
@@ -113,43 +87,40 @@ public class OptionsHandler {
         lastScript = which;
     }
 
-    public void registerClient(final CmdLinker parent, final CmdLinker client) {
-        clients.add(client);
-        client.setOptionsHandler(this);
-        client.setPersistOptions(usingPersistence);
+    public String getScript() {
+        return parameterScript;
+    }
+
+    public boolean isCommand() {
+        return parameterCommand;
+    }
+
+    public void registerWindow(final CmdLinker parent, final CmdLinker child) {
+        windows.add(child);
+        child.setOptionsHandler(this);
+        child.setPersistOptions(usingPersistence);
         if (parent == null) {
-            client.setColors(foreground, background);
-            if (fontSize >= 6)
-                client.setInitFontSize(fontSize);
-            if (script != null) {
-                if (isCheck)
-                    client.checkScript(script);
-                else if (isCommand)
-                    client.processCommand(script);
-                else
-                    client.processScript(script);
-            }
             if (x == -1)
-                positionWindow(client, 20, 20, 600, 500);
+                positionWindow(child, 20, 20, 600, 500);
             else
-                positionWindow(client, x, y, w, h);
+                positionWindow(child, x, y, w, h);
         } else {
             Point pp = parent.getLocation();
             Dimension size = parent.getSize();
-            positionWindow(client, pp.x + 20, pp.y + 20, size.width,
+            positionWindow(child, pp.x + 20, pp.y + 20, size.width,
                     size.height);
         }
-        client.addWindowListener(new WindowAdapter() {
+        child.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                w = client.getSize().width;
-                h = client.getSize().height;
-                x = client.getLocation().x;
-                y = client.getLocation().y;
+                w = child.getSize().width;
+                h = child.getSize().height;
+                x = child.getLocation().x;
+                y = child.getLocation().y;
             }
 
             public void windowClosed(WindowEvent e) {
-                clients.remove(client);
-                if (clients.isEmpty()) {
+                windows.remove(child);
+                if (windows.isEmpty()) {
                     if (usingPersistence)
                         savePropertiesFile();
                     else
@@ -173,8 +144,8 @@ public class OptionsHandler {
     public void persistOptions(boolean enable) {
         if (enable != usingPersistence) {
             usingPersistence = enable;
-            for (CmdLinker client : clients)
-                client.setPersistOptions(enable);
+            for (CmdLinker window : windows)
+                window.setPersistOptions(enable);
         }
     }
 
@@ -183,11 +154,9 @@ public class OptionsHandler {
     }
 
     private void decodeProperties(Properties props) {
-        background = ColorString.getColor(props
-                .getProperty(PROP_BACKGROUND, ""));
-        foreground = ColorString.getColor(props
-                .getProperty(PROP_FOREGROUND, ""));
-        fontSize = getIntProperty(props.getProperty(PROP_FONT));
+        appearance.setBackground(ColorString.getColor(props.getProperty(PROP_BACKGROUND, "")));
+        appearance.setForeground(ColorString.getColor(props.getProperty(PROP_FOREGROUND, "")));
+        appearance.setFontSize(getIntProperty(props.getProperty(PROP_FONT)));
         x = getIntProperty(props.getProperty(PROP_X, "-1"));
         y = getIntProperty(props.getProperty(PROP_Y, "-1"));
         w = getIntProperty(props.getProperty(PROP_W, "-1"));
@@ -202,12 +171,9 @@ public class OptionsHandler {
 
     private Properties encodeProperties() {
         Properties ret = new Properties();
-        if (background != null)
-            ret.put(PROP_BACKGROUND, ColorString.getColor(background));
-        if (foreground != null)
-            ret.put(PROP_FOREGROUND, ColorString.getColor(foreground));
-        if (fontSize != -1)
-            ret.put(PROP_FONT, String.valueOf(fontSize));
+        ret.put(PROP_BACKGROUND, ColorString.getColor(appearance.getBackground()));
+        ret.put(PROP_FOREGROUND, ColorString.getColor(appearance.getForeground()));
+        ret.put(PROP_FONT, String.valueOf(appearance.getFont().getSize()));
         if (x != -1)
             ret.put(PROP_X, String.valueOf(x));
         if (y != -1)
@@ -279,9 +245,10 @@ public class OptionsHandler {
                         argumentsError = "Color not provided";
                     else {
                         String color = args[i++];
-                        this.foreground = ColorString.getColor(color);
-                        if (this.foreground == null)
+                        Color foreground = ColorString.getColor(color);
+                        if (foreground == null)
                             argumentsError = "Invalid color:" + color;
+                        appearance.setForeground(foreground);
                     }
                     break;
                 case BACKGROUND_OPTION:
@@ -289,9 +256,10 @@ public class OptionsHandler {
                         argumentsError = "Color not provided";
                     else {
                         String color = args[i++];
-                        this.background = ColorString.getColor(color);
-                        if (this.background == null)
+                        Color background = ColorString.getColor(color);
+                        if (background == null)
                             argumentsError = "Invalid color:" + color;
+                        appearance.setBackground(background);
                     }
                     break;
                 case FONT_OPTION:
@@ -300,7 +268,7 @@ public class OptionsHandler {
                     else {
                         String font = args[i++];
                         try {
-                            this.fontSize = Integer.parseInt(font);
+                            appearance.setFontSize(Integer.parseInt(font));
                         } catch (NumberFormatException nfe) {
                             argumentsError = "Invalid font size:" + font;
                         }
@@ -309,20 +277,18 @@ public class OptionsHandler {
                 default:
                     String first = args[i++];
                     if (first.equals(COMMAND_OPTION))
-                        this.isCommand = true;
-                    else if (first.equals(CHECK_OPTION))
-                        this.isCheck = true;
+                        this.parameterCommand = true;
                     else
                         --i;
 
                     if (i == args.length)
                         argumentsError = "Script or command not provided";
-                    else if (!this.isCommand && (i + 1 != args.length))
+                    else if (!this.parameterCommand && (i + 1 != args.length))
                         argumentsError = "A script cannot be provided with arguments";
                     else {
-                        this.script = args[i++];
+                        this.parameterScript = args[i++];
                         while (i < args.length)
-                            this.script += " " + args[i++];
+                            this.parameterScript += " " + args[i++];
                     }
                     break;
             }
@@ -332,12 +298,9 @@ public class OptionsHandler {
     private String getHelpString() {
         return String
                 .format(
-                        "Syntax: [%s] [%s color] [%s color] [%s fontSize] [%s|%s] scriptOrCommand"
-                                + "\n  Using %s does not execute the programs in command"
-                                + "\n  With the argument %s, the following arguments are treated as a command",
+                        "Syntax: [%s] [%s color] [%s color] [%s fontSize] [script | %s command [...]]",
                         HELP_OPTION, FOREGROUND_OPTION, BACKGROUND_OPTION,
-                        FONT_OPTION, CHECK_OPTION, COMMAND_OPTION,
-                        CHECK_OPTION, COMMAND_OPTION);
+                        FONT_OPTION, COMMAND_OPTION);
     }
 
 }

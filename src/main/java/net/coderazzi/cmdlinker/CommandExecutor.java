@@ -7,7 +7,7 @@ import java.util.List;
 
 public class CommandExecutor {
     public enum ExecutionEnd {
-        Normal, ExceptionError, Terminated;
+        Normal, ExceptionError, Terminated
     }
 
     public interface Client {

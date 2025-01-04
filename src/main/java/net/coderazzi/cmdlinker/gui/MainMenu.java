@@ -69,7 +69,7 @@ public class MainMenu extends JMenuBar {
         menu.setMnemonic(KeyEvent.VK_F);
 
         JMenuItem item = new JMenuItem("New command ...", KeyEvent.VK_N);
-        item.addActionListener(e -> owner.newCommand());
+        item.addActionListener(e -> owner.promptForCommand());
         item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
                 ActionEvent.CTRL_MASK));
         menu.add(item);
@@ -88,7 +88,7 @@ public class MainMenu extends JMenuBar {
         menu.addSeparator();
 
         JMenuItem newWindow = new JMenuItem("New window");
-        newWindow.addActionListener(e -> owner.newWindow());
+        newWindow.addActionListener(e -> owner.createNewWindow());
         menu.add(newWindow);
 
         closeAll = new JMenuItem("Close all tabs");
@@ -116,12 +116,7 @@ public class MainMenu extends JMenuBar {
         JMenu menu = new JMenu("Help");
         menu.setMnemonic(KeyEvent.VK_H);
 
-        JMenuItem item = new JMenuItem("Check script...");
-        item.addActionListener(e -> owner.checkScript());
-        menu.add(item);
-        menu.addSeparator();
-
-        item = new JMenuItem("About...");
+        JMenuItem item =  new JMenuItem("About...");
         item.addActionListener(e -> JOptionPane.showMessageDialog(owner, Version.getVersion(),
                 "About", JOptionPane.INFORMATION_MESSAGE));
         menu.add(item);

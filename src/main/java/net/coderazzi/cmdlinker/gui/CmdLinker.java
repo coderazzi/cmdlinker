@@ -1,8 +1,6 @@
 package net.coderazzi.cmdlinker.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -18,24 +16,19 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import net.coderazzi.cmdlinker.Appearance;
 import net.coderazzi.cmdlinker.ScriptCommandException;
 import net.coderazzi.cmdlinker.ScriptProcessor;
-import net.coderazzi.cmdlinker.ScriptProcessorListener;
 import net.coderazzi.cmdlinker.Version;
 
-public class CmdLinker extends JFrame implements ScriptProcessorListener {
-    public final static String DEFAULT_FONT_FAMILY = "Monospaced";
-
+public class CmdLinker extends JFrame  {
     private final List<Tab> tabs = new ArrayList<>();
     private final ScriptProcessor scriptProcessor;
     private final MainMenu menuBar;
+    private final Appearance appearance;
 
     private JTabbedPane tabsPane;
-    private Tab currentScriptTab;
     private ProcessingScriptSplashScreen splashScreen;
-    private Font font, backupFont;
-    private Color foreground, background, backupFg, backupBg;
-    private boolean autoScroll = true, currentTabAvailable, checkingCommand;
     private transient boolean aborted, revertChangesIfAborted;
     private int firstScriptTab;
     private String lastScript, lastCommand;
@@ -45,8 +38,9 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
     private final Pattern separatorPattern = Pattern
             .compile("^(?:\"((\\\\.|[^\\\\\"])*)\"|([^\"]\\S*))\\s*(.*)$");
 
-    public CmdLinker() {
+    public CmdLinker(Appearance appearance) {
         super("Cmd Linker");
+        this.appearance = appearance;
         setIconImage(IconLoader.getIcon("cmdlinker").getImage());
         initFrame();
         pack();
@@ -82,16 +76,13 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
     }
 
     protected CmdLinker(CmdLinker copy) {
-        this();
+        this(new Appearance(copy.appearance));
         this.setOptionsHandler(copy.optionsHandler);
         this.lastScript = copy.lastScript;
         this.lastCommand = copy.lastCommand;
-        this.font = copy.font;
-        this.background = copy.background;
-        this.foreground = copy.foreground;
         this.runScriptDialog.copyParameters(copy.runScriptDialog);
         this.runCommandDialog.copyParameters(copy.runCommandDialog);
-        copy.optionsHandler.registerClient(copy, this);
+        copy.optionsHandler.registerWindow(copy, this);
     }
 
     public void setOptionsHandler(OptionsHandler optionsHandler) {
@@ -106,28 +97,26 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
      * Called from the Gui
      */
     public void changeDisplay() {
-        DisplayDialog cd = new DisplayDialog(this, foreground, background, font);
-        cd.setVisible(true);
-        if (cd.okPressed()) {
-            foreground = cd.getForegroundChoice();
-            background = cd.getBackgroundChoice();
-            font = cd.getFontChoice();
-            optionsHandler.setDisplayProperties(foreground, background, font
-                    .getSize());
-            if (!tabs.isEmpty()) {
-                if (JOptionPane.YES_OPTION == JOptionPane
-                        .showConfirmDialog(
-                                this,
-                                "Set up these colors on existing consoles?"
-                                        + "\n(Answering 'No' implies that the colors are only used on new consoles)",
-                                "Colors change", JOptionPane.YES_NO_OPTION)) {
-                    for (Tab tab : tabs) {
-                        tab.setColors(foreground, background);
-                        tab.setTextFont(font);
-                    }
-                }
-            }
-        }
+        //TODO!!!!
+//        DisplayDialog cd = new DisplayDialog(this, appearance);
+//        cd.setVisible(true);
+//        if (cd.okPressed()) {
+//            appearance = cd.getAppearance();
+//            optionsHandler.setDisplayProperties(appearance);
+//            if (!tabs.isEmpty()) {
+//                if (JOptionPane.YES_OPTION == JOptionPane
+//                        .showConfirmDialog(
+//                                this,
+//                                "Set up these colors on existing consoles?"
+//                                        + "\n(Answering 'No' implies that the colors are only used on new consoles)",
+//                                "Colors change", JOptionPane.YES_NO_OPTION)) {
+//                    for (Tab tab : tabs) {
+//                        tab.setColors(foreground, background);
+//                        tab.setTextFont(font);
+//                    }
+//                }
+//            }
+//        }
     }
 
     public void setPersistOptions(boolean persist) {
@@ -175,7 +164,7 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
     /**
      * Called from Gui
      */
-    public void newCommand() {
+    public void promptForCommand() {
         String command = runCommandDialog.getCommand(lastCommand);
         if (command != null) {
             lastCommand = command;
@@ -186,7 +175,7 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
     /**
      * Called from Gui
      */
-    public void newWindow() {
+    public void createNewWindow() {
         new CmdLinker(this).setVisible(true);
     }
 
@@ -199,30 +188,11 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
         lastCommand = command;
         firstScriptTab = tabs.size();
         try {
-            execute(command);
-            showTab("1");
+            execute(command, appearance);
+//            showTab("1");
         } catch (ScriptCommandException sce) {
             JOptionPane.showMessageDialog(this, sce.getMessage(),
                     "Invalid command", JOptionPane.ERROR_MESSAGE);
-        }
-        currentScriptTab = null;
-    }
-
-    /**
-     * Called from Gui
-     */
-    public void checkScript(String name) {
-        checkingCommand = true;
-        processScript(name);
-    }
-
-    /**
-     * Called from Gui
-     */
-    public void checkScript() {
-        String command = runScriptDialog.getCommand(lastScript);
-        if (command != null) {
-            checkScript(command);
         }
     }
 
@@ -233,11 +203,8 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
         lastScript = name;
         firstScriptTab = tabs.size();
         aborted = false;
-        backupFg = foreground;
-        backupBg = background;
-        backupFont = font;
         splashScreen = new ProcessingScriptSplashScreen(this, name);
-        scriptProcessor.process(name);
+        scriptProcessor.process(name, new Appearance(appearance));
         splashScreen.setVisible(true);
     }
 
@@ -281,15 +248,10 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
             tab.stopCommand();
     }
 
-    public void setInitFontSize(int size) {
-        font = font.deriveFont((float) size);
-    }
-
     private void initFrame() {
         setLayout(new BorderLayout());
         tabsPane = new JTabbedPane();
         add(tabsPane, BorderLayout.CENTER);
-        font = new Font(DEFAULT_FONT_FAMILY, Font.PLAIN, 11);
     }
 
     private void executeSwingTask(Runnable runnable) {
@@ -316,10 +278,6 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
             parameters = m.group(4);
             m = separatorPattern.matcher(parameters);
         }
-        System.out.println("Execution of " + ret.size());
-        for (String s : ret) {
-            System.out.println(s);
-        }
         if (!parameters.trim().isEmpty())
             throw new ScriptCommandException("Could not parse command >"
                     + executionParameters);
@@ -333,16 +291,6 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
         executeSwingTask(() -> {
             splashScreen.setVisible(false);
             splashScreen = null;
-            if (currentScriptTab != null && currentTabAvailable) {
-                if (!aborted)
-                    JOptionPane
-                            .showMessageDialog(
-                                    CmdLinker.this,
-                                    "Every created tab must have an associated task",
-                                    "Script error",
-                                    JOptionPane.ERROR_MESSAGE);
-                currentScriptTab.close();
-            }
             if (aborted && revertChangesIfAborted) {
                 while (tabs.size() > firstScriptTab) {
                     tabs.get(tabs.size() - 1).close();
@@ -353,12 +301,7 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
                     tabsPane.setSelectedIndex(firstScriptTab);
                 }
             }
-            currentScriptTab = null;
-            foreground = backupFg;
-            background = backupBg;
-            font = backupFont;
-            menuBar.enableRunLastScript(!checkingCommand);
-            checkingCommand = false;
+            menuBar.enableRunLastScript(true);
         });
     }
 
@@ -366,14 +309,12 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
      * ScriptProcessorListener interface
      */
     public void waitTime(long milliseconds) {
-        if (!checkingCommand) {
-            long finalTime = System.currentTimeMillis() + milliseconds;
-            while (System.currentTimeMillis() < finalTime && !aborted) {
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException ie) {
-                    break;
-                }
+        long finalTime = System.currentTimeMillis() + milliseconds;
+        while (System.currentTimeMillis() < finalTime && !aborted) {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException ie) {
+                break;
             }
         }
     }
@@ -381,31 +322,9 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
     /**
      * ScriptProcessorListener interface
      */
-    public void execute(String command) throws ScriptCommandException {
+    public void execute(String command, Appearance appearance) throws ScriptCommandException {
         List<String> splitCommand = parseExecutable(command);
-        boolean createTab = !currentTabAvailable;
-        currentTabAvailable = false;
-        executeSwingTask(new TabExecutor(command, splitCommand, createTab));
-    }
-
-    /**
-     * ScriptProcessorListener interface
-     */
-    public void createTab(String name) throws ScriptCommandException {
-        if (currentTabAvailable)
-            throw new ScriptCommandException(
-                    "Cannot create a tab if there is one available for usage");
-        currentTabAvailable = true;
-        executeSwingTask(new TabCreator(name));
-    }
-
-    /**
-     * ScriptProcessorListener interface
-     */
-    public synchronized void scriptProcessingError(final String error) {
-        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(
-                CmdLinker.this, error, "Script Error",
-                JOptionPane.ERROR_MESSAGE));
+        executeSwingTask(new Executor(command, splitCommand, appearance));
     }
 
     /**
@@ -415,148 +334,40 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
         executeSwingTask(new TabShower(which));
     }
 
-    /**
-     * ScriptProcessorListener interface
-     */
-    public void setColors(Color foreground, Color background) {
-        executeSwingTask(new ColorsSetter(foreground, background));
+    private Tab createTab(Appearance appearance) {
+        Tab ret = new Tab(CmdLinker.this, appearance);
+        tabs.add(ret);
+        ret.addToTabPane(tabsPane, appearance.getTitle());
+        appearance.setTitle(null);
+        menuBar.enableCloseAll(true);
+        return ret;
     }
 
-    /**
-     * ScriptProcessorListener interface
-     */
-    public void setTextFont(Font font) {
-        executeSwingTask(new FontSetter(font));
-    }
-
-    /**
-     * ScriptProcessorListener interface
-     */
-    public void setAutoScroll(boolean scroll) {
-        executeSwingTask(new ScrollSetter(scroll));
-    }
-
-    /**
-     * **************************************************************************
-     * Runnable to set the colors of a tab
-     * **************************************************************************
-     */
-    class ColorsSetter implements Runnable {
-        final Color foregColor;
-        final Color backColor;
-
-        public ColorsSetter(Color foregColor, Color backColor) {
-            this.foregColor = foregColor;
-            this.backColor = backColor;
-        }
-
-        public void run() {
-            if (foregColor != null)
-                CmdLinker.this.foreground = foregColor;
-            if (backColor != null)
-                CmdLinker.this.background = backColor;
-            if (currentScriptTab != null) {
-                currentScriptTab.setColors(foregColor, backColor);
-            }
-        }
-    }
-
-    /**
-     * **************************************************************************
-     * Runnable to set the font value of a tab
-     * **************************************************************************
-     */
-    class FontSetter implements Runnable {
-        final Font fnt;
-
-        public FontSetter(Font font) {
-            this.fnt = font;
-        }
-
-        public void run() {
-            if (currentScriptTab == null)
-                CmdLinker.this.font = fnt;
-            else
-                currentScriptTab.setTextFont(fnt);
-        }
-    }
-
-    /**
-     * **************************************************************************
-     * Runnable to set the scroll value of a tab
-     * **************************************************************************
-     */
-    class ScrollSetter implements Runnable {
-        final boolean scroll;
-
-        public ScrollSetter(boolean scroll) {
-            this.scroll = scroll;
-        }
-
-        public void run() {
-            if (currentScriptTab == null)
-                CmdLinker.this.autoScroll = scroll;
-            else
-                currentScriptTab.setAutoScroll(scroll);
-        }
-    }
-
-    /**
-     * **************************************************************************
-     * Runnable to create a new tab
-     * **************************************************************************
-     */
-    class TabCreator implements Runnable {
-        String name;
-
-        public TabCreator(String name) {
-            this.name = name;
-        }
-
-        public void run() {
-            currentScriptTab = new Tab(CmdLinker.this, name);
-            if (font != null)
-                currentScriptTab.setTextFont(font);
-            currentScriptTab.setColors(foreground, background);
-            currentScriptTab.setAutoScroll(autoScroll);
-            tabs.add(currentScriptTab);
-            if (name == null)
-                name = String.valueOf(tabs.size());
-            currentScriptTab.addToTabPane(tabsPane, name);
-            menuBar.enableCloseAll(true);
-        }
-    }
 
     /**
      * **************************************************************************
      * Runnable to modify the name and tip of a created tab
      * **************************************************************************
      */
-    class TabExecutor implements Runnable {
+    class Executor implements Runnable {
         final String command;
         final List<String> split;
-        final boolean createTab;
+        final Appearance appearance;
 
-        public TabExecutor(String command, List<String> split, boolean createTab) {
+        public Executor(String command, List<String> split, Appearance appearance) {
             this.command = command;
-            this.createTab = createTab;
             this.split = split;
+            this.appearance = appearance;
         }
 
         public void run() {
-            String name = extractTabName(split.get(0));
-            if (createTab) {
-                new TabCreator(name).run();
-            } else if (currentScriptTab.getName() == null) {
-                currentScriptTab.setName(name);
-                tabsPane.setTitleAt(tabs.size() - 1, name);
+            String title = appearance.getTitle();
+            if (title == null || title.isEmpty()) {
+                appearance.setTitle(extractTabName(split.get(0)));
             }
+            Tab tab = createTab(appearance);
             tabsPane.setToolTipTextAt(tabs.size() - 1, command);
-            if (checkingCommand) {
-                currentScriptTab.showCheckInfo(command);
-            } else {
-                currentScriptTab.process(split);
-            }
+            tab.process(split);
         }
 
         private String extractTabName(String executable) {
@@ -627,9 +438,16 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
         if (argumentsError != null) {
             System.out.println("\n" + argumentsError);
         } else {
-            CmdLinker linker = new CmdLinker();
-            arguments.registerClient(null, linker);
+            CmdLinker linker = new CmdLinker(arguments.getAppearance());
+            arguments.registerWindow(null, linker);
             linker.setVisible(true);
+            String script = arguments.getScript();
+            if (script != null) {
+                if (arguments.isCommand())
+                    linker.processCommand(script);
+                else
+                    linker.processScript(script);
+            }
         }
     }
 

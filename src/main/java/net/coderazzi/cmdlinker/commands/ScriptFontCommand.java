@@ -6,8 +6,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.coderazzi.cmdlinker.ScriptCommandException;
-import net.coderazzi.cmdlinker.ScriptProcessorListener;
 
+import net.coderazzi.cmdlinker.Appearance;
 import net.coderazzi.cmdlinker.gui.CmdLinker;
 
 /**
@@ -36,14 +36,13 @@ public class ScriptFontCommand implements ScriptCommand {
     }
 
     @Override
-    public void execute(ScriptProcessorListener target, String commandLine)
+    public void execute(String parameters, CmdLinker target, Appearance settings)
             throws ScriptCommandException {
-        Matcher match = pattern.matcher(commandLine);
+        Matcher match = pattern.matcher(parameters);
         if (!match.matches())
             throw new ScriptCommandException(
                     "<<html>Invalid font syntax<br>FONT [name [style]] size</html>");
-        target.setTextFont(getFont(match.group(1), match.group(2), match
-                .group(3)));
+        settings.setFont(getFont(match.group(1), match.group(2), match.group(3)));
     }
 
     private Font getFont(String name, String style, String size)
@@ -57,7 +56,7 @@ public class ScriptFontCommand implements ScriptCommand {
             st = v;
         }
         if (name == null)
-            name = CmdLinker.DEFAULT_FONT_FAMILY;
+            name = Appearance.DEFAULT_FONT_FAMILY;
         return new Font(name, st, s);
     }
 

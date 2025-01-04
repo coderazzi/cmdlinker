@@ -1,8 +1,6 @@
 package net.coderazzi.cmdlinker.gui;
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
@@ -21,16 +19,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+import net.coderazzi.cmdlinker.Appearance;
 import net.coderazzi.cmdlinker.CommandExecutor;
 
 public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
     final static private int MAX_LINE_LENGTH_TO_CUT = 80;
-    final static private String SHOW_TEXT = "st";
-    final static private String SHOW_CHECK = "sc";
 
     private final TabStatus status;
-    private final TabCheckInfo checkInfo;
-    private final JPanel cards;
     private final StringBuilder buffer = new StringBuilder();
     private final CmdLinker owner;
     private final TabMenu associatedMenu;
@@ -39,24 +34,21 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
     private Document document;
     private TabOptions tabOptions;
     private String name;
-    private boolean autoScroll = true;
+    private boolean autoScroll;
     private CommandExecutor commandExecutor;
 
     /**
      * Constructor. The name parameter is used just by convenience, accessible
      * via getName
      */
-    public Tab(CmdLinker owner, String name) {
+    public Tab(CmdLinker owner, Appearance appearance) {
         super(new BorderLayout());
         this.owner = owner;
-        this.name = name;
+        this.name = appearance.getTitle();
         this.associatedMenu = new TabMenu(this);
-        checkInfo = new TabCheckInfo();
+        this.autoScroll = appearance.isAutoScroll();
         status=new TabStatus(this);
-        cards = new JPanel(new CardLayout());
-        cards.add(createTextArea(), SHOW_TEXT);
-        cards.add(checkInfo, SHOW_CHECK);
-        add(cards, BorderLayout.CENTER);
+        add(createTextArea(appearance), BorderLayout.CENTER);
     }
     
     public void addToTabPane(JTabbedPane tabsPane, String name)
@@ -116,8 +108,11 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
         commandExecutor.restart();
     }
 
-    private JPanel createTextArea() {
+    private JPanel createTextArea(Appearance appearance) {
         text = new JTextArea();
+        text.setFont(appearance.getFont());
+        text.setForeground(appearance.getForeground());
+        text.setBackground(appearance.getBackground());
         text.setEditable(false);
         text.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -146,26 +141,12 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
         return ret;
     }
 
-    private void showCard(String card) {
-        ((CardLayout) cards.getLayout()).show(cards, card);
-    }
-
     /**
      * Processes the passed command
      */
     public synchronized void process(List<String> command) {
-        showCard(SHOW_TEXT);
         commandExecutor = new CommandExecutor(this);
         commandExecutor.execute(command);
-    }
-
-    /**
-     * Shows info on the command, This ise used to check scripts
-     */
-    public void showCheckInfo(String command) {
-        checkInfo.setCommand(command);
-        showCard(SHOW_CHECK);
-        commandExecutor = null;
     }
 
     /**
@@ -200,7 +181,6 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
     public void setTextFont(Font font) {
         int oldSize = text.getFont().getSize();
         text.setFont(font);
-        checkInfo.setFont(font);
         if (oldSize != font.getSize())
             tabOptions.setFontSize(font.getSize());
     }
@@ -210,25 +190,23 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
     }
 
     public void changeDisplay() {
-        DisplayDialog cd = new DisplayDialog(owner, text.getForeground(), text
-                .getBackground(), text.getFont());
-        cd.setVisible(true);
-        if (cd.okPressed()) {
-            setColors(cd.getForegroundChoice(), cd.getBackgroundChoice());
-            setTextFont(cd.getFontChoice());
-        }
+        // TODO!!!
+//        DisplayDialog cd = new DisplayDialog(owner, text.getForeground(), text
+//                .getBackground(), text.getFont());
+//        cd.setVisible(true);
+//        if (cd.okPressed()) {
+//            setColors(cd.getForegroundChoice(), cd.getBackgroundChoice());
+//            setTextFont(cd.getFontChoice());
+//        }
     }
 
-    /**
-     * This method must be called from the GUI thread
-     */
-    public void setColors(Color foreground, Color background) {
-        if (foreground != null)
-            text.setForeground(foreground);
-        if (background != null)
-            text.setBackground(background);
-        checkInfo.setColors(foreground, background);
-    }
+//    /**
+//     * This method must be called from the GUI thread
+//     */
+//    public void setAppearance(Appearance appearance) {
+//        text.setForeground(appearance.getForeground());
+//        text.setBackground(appearance.getBackground());
+//    }
 
     /**
      * This method must be called from the GUI thread

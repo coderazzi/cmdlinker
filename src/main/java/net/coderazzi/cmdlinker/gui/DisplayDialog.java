@@ -1,9 +1,10 @@
 package net.coderazzi.cmdlinker.gui;
 
+import net.coderazzi.cmdlinker.Appearance;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -18,16 +19,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 public class DisplayDialog extends EscapeDialog {
-    private Font font;
-    private Color foreground, background;
+    private final Appearance appearance;
     private boolean okPressed;
 
-    public DisplayDialog(JFrame parent, Color foreground, Color background,
-            Font font) {
+    public DisplayDialog(JFrame parent, Appearance appearance) {
         super(parent, "Change display properties", true);
-        this.foreground = foreground;
-        this.background = background;
-        this.font = font;
+        this.appearance = new Appearance(appearance);
         getRootPane().setContentPane(initDialog());
         pack();
         setLocationRelativeTo(parent);
@@ -37,16 +34,8 @@ public class DisplayDialog extends EscapeDialog {
         return okPressed;
     }
 
-    public Color getForegroundChoice() {
-        return foreground;
-    }
-
-    public Color getBackgroundChoice() {
-        return background;
-    }
-
-    public Font getFontChoice() {
-        return font;
+    public Appearance getAppearance() {
+        return appearance;
     }
 
     private Color changeColor(String name, Color current) {
@@ -60,9 +49,9 @@ public class DisplayDialog extends EscapeDialog {
         area.setLineWrap(true);
         area.setEditable(false);
         area.setText(getRandomText());
-        area.setForeground(foreground);
-        area.setBackground(background);
-        area.setFont(font);
+        area.setForeground(appearance.getForeground());
+        area.setBackground(appearance.getBackground());
+        area.setFont(appearance.getFont());
         area.setPreferredSize(new Dimension(300, 100));
         area.setBorder(BorderFactory.createEtchedBorder());
 
@@ -74,16 +63,16 @@ public class DisplayDialog extends EscapeDialog {
 
         JButton bgButton = createAutoEnterButton("Background");
         bgButton.addActionListener(e -> {
-            background = changeColor("background", background);
-            area.setBackground(background);
+            appearance.setBackground(changeColor("background", appearance.getBackground()));
+            area.setBackground(appearance.getBackground());
         });
         JButton fgButton = createAutoEnterButton("Foreground");
         fgButton.addActionListener(e -> {
-            foreground = changeColor("foreground", foreground);
-            area.setForeground(foreground);
+            appearance.setForeground(changeColor("foreground", appearance.getForeground()));
+            area.setForeground(appearance.getForeground());
         });
         final JComboBox<Integer> fonts = createFontsCombobox();
-        fonts.setSelectedItem(font.getSize());
+        fonts.setSelectedItem(appearance.getFont().getSize());
         fonts.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER)
@@ -91,9 +80,12 @@ public class DisplayDialog extends EscapeDialog {
             }
         });
         fonts.addItemListener(e -> {
-            font = font.deriveFont(((Integer) fonts.getSelectedItem())
-                    .floatValue());
-            area.setFont(font);
+            Object selected = fonts.getSelectedItem();
+            if (selected instanceof Integer) {
+                appearance.setFont(appearance.getFont().deriveFont(((Integer) selected).floatValue()));
+                area.setFont(appearance.getFont());
+            }
+
         });
 
         JPanel fontPanel = new JPanel(new BorderLayout());

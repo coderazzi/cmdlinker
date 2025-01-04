@@ -4,7 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.coderazzi.cmdlinker.ScriptCommandException;
-import net.coderazzi.cmdlinker.ScriptProcessorListener;
+import net.coderazzi.cmdlinker.Appearance;
+import net.coderazzi.cmdlinker.gui.CmdLinker;
 
 /**
  * Command to accepts the scroll command line Scroll command line has syntax:
@@ -20,13 +21,13 @@ public class ScriptScrollCommand implements ScriptCommand {
     }
 
     @Override
-    public void execute(ScriptProcessorListener target, String commandLine)
+    public void execute(String parameters, CmdLinker target, Appearance settings)
             throws ScriptCommandException {
-        Matcher match = pattern.matcher(commandLine);
+        Matcher match = pattern.matcher(parameters);
         if (!match.matches())
             throw new ScriptCommandException(
                     "<html>Invalid scroll syntax<br>SCROLL on|off</html>");
-        target.setAutoScroll(match.group(1).equals("on"));
+        settings.setAutoScroll(match.group(1).equals("on"));
     }
 
 }

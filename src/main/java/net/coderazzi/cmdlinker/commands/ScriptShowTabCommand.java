@@ -1,7 +1,8 @@
 package net.coderazzi.cmdlinker.commands;
 
 import net.coderazzi.cmdlinker.ScriptCommandException;
-import net.coderazzi.cmdlinker.ScriptProcessorListener;
+import net.coderazzi.cmdlinker.Appearance;
+import net.coderazzi.cmdlinker.gui.CmdLinker;
 
 /**
  * Command to show a specific tab syntax: showTab [name|number]
@@ -14,9 +15,9 @@ public class ScriptShowTabCommand implements ScriptCommand {
     }
 
     @Override
-    public void execute(ScriptProcessorListener target, String commandLine)
+    public void execute(String parameters, CmdLinker target, Appearance settings)
             throws ScriptCommandException {
-        target.showTab(commandLine);
+        target.showTab(parameters);
     }
 
 }

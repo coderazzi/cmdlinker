@@ -1,12 +1,13 @@
 package net.coderazzi.cmdlinker.commands;
 
 import net.coderazzi.cmdlinker.ScriptCommandException;
-import net.coderazzi.cmdlinker.ScriptProcessorListener;
+import net.coderazzi.cmdlinker.Appearance;
+import net.coderazzi.cmdlinker.gui.CmdLinker;
 
 /**
  * Command to create a new tab Syntax: createTab [name]
  */
-public class ScriptCreateTabCommand implements ScriptCommand {
+public class ScriptTabCommand implements ScriptCommand {
 
     @Override
     public String getCommand() {
@@ -14,8 +15,8 @@ public class ScriptCreateTabCommand implements ScriptCommand {
     }
 
     @Override
-    public void execute(ScriptProcessorListener target, String commandLine)
+    public void execute(String parameters, CmdLinker target, Appearance settings)
             throws ScriptCommandException {
-        target.createTab(commandLine);
+        settings.setTitle(parameters);
     }
 }

@@ -2,7 +2,8 @@ package net.coderazzi.cmdlinker.commands;
 
 import net.coderazzi.cmdlinker.ColorString;
 import net.coderazzi.cmdlinker.ScriptCommandException;
-import net.coderazzi.cmdlinker.ScriptProcessorListener;
+import net.coderazzi.cmdlinker.Appearance;
+import net.coderazzi.cmdlinker.gui.CmdLinker;
 
 /**
  * Command to accepts the color command line
@@ -18,8 +19,8 @@ public class ScriptBackgroundCommand implements ScriptCommand {
     }
 
     @Override
-    public void execute(ScriptProcessorListener target, String commandLine)
+    public void execute(String parameters, CmdLinker target, Appearance settings)
             throws ScriptCommandException {
-        target.setBackground(ColorString.getValidColor(commandLine));
+        settings.setBackground(ColorString.getValidColor(parameters));
     }
 }
