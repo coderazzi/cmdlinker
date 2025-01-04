@@ -451,12 +451,11 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
         }
 
         public void run() {
-            if (currentScriptTab == null) {
-                if (foregColor != null)
-                    CmdLinker.this.foreground = foregColor;
-                if (backColor != null)
-                    CmdLinker.this.background = backColor;
-            } else {
+            if (foregColor != null)
+                CmdLinker.this.foreground = foregColor;
+            if (backColor != null)
+                CmdLinker.this.background = backColor;
+            if (currentScriptTab != null) {
                 currentScriptTab.setColors(foregColor, backColor);
             }
         }
@@ -538,8 +537,7 @@ public class CmdLinker extends JFrame implements ScriptProcessorListener {
         final List<String> split;
         final boolean createTab;
 
-        public TabExecutor(String command, List<String> split,
-                boolean createTab) {
+        public TabExecutor(String command, List<String> split, boolean createTab) {
             this.command = command;
             this.createTab = createTab;
             this.split = split;

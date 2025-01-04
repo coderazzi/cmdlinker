@@ -25,33 +25,21 @@ import net.coderazzi.cmdlinker.CommandExecutor;
 
 public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
     final static private int MAX_LINE_LENGTH_TO_CUT = 80;
-
     final static private String SHOW_TEXT = "st";
-
     final static private String SHOW_CHECK = "sc";
 
-    private JTextArea text;
-
-    private Document document;
-    
     private final TabStatus status;
-
-    private TabOptions tabOptions;
-
     private final TabCheckInfo checkInfo;
-
     private final JPanel cards;
-
     private final StringBuilder buffer = new StringBuilder();
-
     private final CmdLinker owner;
-
-    private String name;
-
-    private boolean autoScroll = true;
-
     private final TabMenu associatedMenu;
 
+    private JTextArea text;
+    private Document document;
+    private TabOptions tabOptions;
+    private String name;
+    private boolean autoScroll = true;
     private CommandExecutor commandExecutor;
 
     /**

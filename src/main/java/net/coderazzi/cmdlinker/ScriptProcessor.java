@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
-import net.coderazzi.cmdlinker.commands.ScriptColorsCommand;
+import net.coderazzi.cmdlinker.commands.ScriptForegroundCommand;
 import net.coderazzi.cmdlinker.commands.ScriptCommand;
 import net.coderazzi.cmdlinker.commands.ScriptCreateTabCommand;
 import net.coderazzi.cmdlinker.commands.ScriptExecuteCommand;
@@ -28,7 +28,7 @@ public class ScriptProcessor implements Runnable {
     public ScriptProcessor(ScriptProcessorListener owner) {
         this.owner = owner;
         addCommand(new ScriptExecuteCommand());
-        addCommand(new ScriptColorsCommand());
+        addCommand(new ScriptForegroundCommand());
         addCommand(new ScriptCreateTabCommand());
         addCommand(new ScriptFontCommand());
         addCommand(new ScriptScrollCommand());
@@ -102,7 +102,7 @@ public class ScriptProcessor implements Runnable {
                 if (sc != null) {
                     sc.execute(owner, line.substring(space + 1).trim());
                     return;
-                }                
+                }
                 line = command;
             }
             throw new ScriptCommandException("Unknown command: " + line);

@@ -35,4 +35,11 @@ public abstract class ColorString {
         }
     }
 
+    public static Color getValidColor(String parameter) throws ScriptCommandException {
+        Color color = getColor(parameter);
+        if (color == null)
+            throw new ScriptCommandException("Invalid color: " + parameter);
+        return color;
+    }
+
 }

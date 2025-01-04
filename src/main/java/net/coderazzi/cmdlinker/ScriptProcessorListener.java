@@ -23,10 +23,15 @@ public interface ScriptProcessorListener {
     void scriptProcessingError(String error);
 
     /**
-     * Method called to set the color of all or the most recent created tab This
-     * method is always called from a separate thread.
+     * Method called to set the foreground of all the next tab to create
      */
-    void setColors(Color foreground, Color background)
+    void setForeground(Color foreground)
+            throws ScriptCommandException;
+
+    /**
+     * Method called to set the background of all the next tab to create
+     */
+    void setBackground(Color foreground)
             throws ScriptCommandException;
 
     /**
