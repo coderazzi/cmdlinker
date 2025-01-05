@@ -1,5 +1,6 @@
 package net.coderazzi.cmdlinker;
 
+import javax.swing.*;
 import java.awt.*;
 
 public class Appearance {
@@ -20,9 +21,16 @@ public class Appearance {
     public Appearance(Appearance appearance)  {
         foreground = appearance.foreground;
         background = appearance.background;
-        title = appearance.title;
+//        title = appearance.title;
         font = appearance.font;
         autoScroll = appearance.autoScroll;
+    }
+
+    public Appearance(JTextArea area, boolean autoScroll)  {
+        font =  area.getFont();
+        foreground = area.getForeground();
+        background = area.getBackground();
+        this.autoScroll = autoScroll;
     }
 
     public Color getForeground() {

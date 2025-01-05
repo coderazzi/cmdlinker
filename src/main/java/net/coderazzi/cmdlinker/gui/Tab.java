@@ -29,11 +29,11 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
     private final StringBuilder buffer = new StringBuilder();
     private final CmdLinker owner;
     private final TabMenu associatedMenu;
+    private final Appearance appearance;
 
     private JTextArea text;
     private Document document;
     private TabOptions tabOptions;
-    private String name;
     private boolean autoScroll;
     private CommandExecutor commandExecutor;
 
@@ -43,16 +43,18 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
      */
     public Tab(CmdLinker owner, Appearance appearance) {
         super(new BorderLayout());
+        this.appearance = new Appearance(appearance);
         this.owner = owner;
-        this.name = appearance.getTitle();
         this.associatedMenu = new TabMenu(this);
-        this.autoScroll = appearance.isAutoScroll();
         status=new TabStatus(this);
-        add(createTextArea(appearance), BorderLayout.CENTER);
+        add(createTextArea(), BorderLayout.CENTER);
+    }
+
+    public Appearance getAppearance() {
+        return appearance;
     }
     
-    public void addToTabPane(JTabbedPane tabsPane, String name)
-    {
+    public void addToTabPane(JTabbedPane tabsPane, String name) {
         tabsPane.addTab(name, this);
         status.setTabbedPane(tabsPane);
     }
@@ -62,26 +64,11 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
         associatedMenu.populateMenu(menu);
     }
 
-    /**
-     * Return the name passed in the constructor
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the name
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public void rename() {
-        String newName = JOptionPane.showInputDialog(owner, "New tab name:",
-                name);
+        String newName = JOptionPane.showInputDialog(owner, "New tab name:", appearance.getTitle());
         if (newName != null) {
-            name = newName;
-            owner.renameTab(this, name);
+            appearance.setTitle(newName);
+            owner.renameTab(this, newName);
         }
     }
 
@@ -108,7 +95,7 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
         commandExecutor.restart();
     }
 
-    private JPanel createTextArea(Appearance appearance) {
+    private JPanel createTextArea() {
         text = new JTextArea();
         text.setFont(appearance.getFont());
         text.setForeground(appearance.getForeground());
@@ -189,24 +176,27 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
         setTextFont(text.getFont().deriveFont(size));
     }
 
-    public void changeDisplay() {
-        // TODO!!!
-//        DisplayDialog cd = new DisplayDialog(owner, text.getForeground(), text
-//                .getBackground(), text.getFont());
-//        cd.setVisible(true);
-//        if (cd.okPressed()) {
-//            setColors(cd.getForegroundChoice(), cd.getBackgroundChoice());
-//            setTextFont(cd.getFontChoice());
-//        }
+    public void showAppearanceMenu() {
+        DisplayDialog cd = new DisplayDialog(owner, appearance);
+        cd.setVisible(true);
+        if (cd.okPressed()) {
+            Appearance appearance = cd.getAppearance();
+            if (cd.isApplyToAll()) {
+                owner.setColorsAndFont(appearance);
+            } else {
+                setColorsAndFont(appearance);
+            }
+        }
     }
 
-//    /**
-//     * This method must be called from the GUI thread
-//     */
-//    public void setAppearance(Appearance appearance) {
-//        text.setForeground(appearance.getForeground());
-//        text.setBackground(appearance.getBackground());
-//    }
+    public void setColorsAndFont(Appearance appearance) {
+        this.appearance.setBackground(appearance.getBackground());
+        this.appearance.setForeground(appearance.getForeground());
+        this.appearance.setFont(appearance.getFont());
+        text.setForeground(appearance.getForeground());
+        text.setBackground(appearance.getBackground());
+        setTextFont(appearance.getFont());
+    }
 
     /**
      * This method must be called from the GUI thread

@@ -44,7 +44,7 @@ public class ScriptProcessor {
         running = true;
         new Thread(() -> {
             try {
-                processFile(scriptFile, appearance);
+                processFile(scriptFile, new Appearance(appearance));
             } catch (IOException ex) {
                 errorProcessingScript("Could not read file " + scriptFile);
             }

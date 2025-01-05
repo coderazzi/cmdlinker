@@ -10,17 +10,12 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Random;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JColorChooser;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.*;
 
 public class DisplayDialog extends EscapeDialog {
     private final Appearance appearance;
     private boolean okPressed;
+    private static boolean applyToAll = false;
 
     public DisplayDialog(JFrame parent, Appearance appearance) {
         super(parent, "Change display properties", true);
@@ -32,6 +27,10 @@ public class DisplayDialog extends EscapeDialog {
 
     public boolean okPressed() {
         return okPressed;
+    }
+
+    public boolean isApplyToAll() {
+        return applyToAll;
     }
 
     public Appearance getAppearance() {
@@ -80,12 +79,11 @@ public class DisplayDialog extends EscapeDialog {
             }
         });
         fonts.addItemListener(e -> {
-            Object selected = fonts.getSelectedItem();
-            if (selected instanceof Integer) {
-                appearance.setFont(appearance.getFont().deriveFont(((Integer) selected).floatValue()));
+            Object si = fonts.getSelectedItem();
+            if (si instanceof Integer) {
+                appearance.setFontSize((Integer) si);
                 area.setFont(appearance.getFont());
             }
-
         });
 
         JPanel fontPanel = new JPanel(new BorderLayout());
@@ -130,7 +128,16 @@ public class DisplayDialog extends EscapeDialog {
 
         JPanel content = new JPanel(new BorderLayout());
         content.add(colors, BorderLayout.CENTER);
-        content.add(createButtonsPanel(ok, cancel), BorderLayout.SOUTH);
+
+        JPanel southPanel = new JPanel(new BorderLayout());
+        southPanel.add(createButtonsPanel(ok, cancel), BorderLayout.SOUTH);
+
+        JCheckBox item = new JCheckBox("Apply to all consoles");
+        item.setSelected(applyToAll);
+        item.addActionListener(e -> applyToAll = item.isSelected());
+
+        southPanel.add(item, BorderLayout.NORTH);
+        content.add(southPanel, BorderLayout.SOUTH);
 
         return content;
     }

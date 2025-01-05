@@ -36,8 +36,7 @@ public class EscapeDialog extends JDialog {
         JPanel buttonsWrapper = new JPanel(new GridLayout(1, 2, 6, 6));
         buttonsWrapper.add(ok);
         buttonsWrapper.add(cancel);
-        buttonsWrapper
-                .setBorder(BorderFactory.createEmptyBorder(12, 0, 12, 12));
+        buttonsWrapper.setBorder(BorderFactory.createEmptyBorder(12, 0, 12, 12));
 
         JPanel buttons = new JPanel(new BorderLayout());
         buttons.add(buttonsWrapper, BorderLayout.EAST);

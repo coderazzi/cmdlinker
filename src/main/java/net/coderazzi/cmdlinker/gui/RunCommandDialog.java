@@ -44,11 +44,6 @@ public class RunCommandDialog extends EscapeDialog {
         setLocationRelativeTo(parent);
     }
 
-    public void copyParameters(RunCommandDialog copy) {
-        fileManual.setText(copy.fileManual.getText());
-        fileDialog.setDirectory(copy.fileDialog.getDirectory());
-    }
-
     public String getCommand(String lastCommand) {
         if (lastCommand != null)
             setFileDirectory(lastCommand);

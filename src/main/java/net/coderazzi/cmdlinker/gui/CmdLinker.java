@@ -25,8 +25,8 @@ public class CmdLinker extends JFrame  {
     private final List<Tab> tabs = new ArrayList<>();
     private final ScriptProcessor scriptProcessor;
     private final MainMenu menuBar;
-    private final Appearance appearance;
 
+    private Appearance appearance;
     private JTabbedPane tabsPane;
     private ProcessingScriptSplashScreen splashScreen;
     private transient boolean aborted, revertChangesIfAborted;
@@ -70,6 +70,7 @@ public class CmdLinker extends JFrame  {
             Tab tab = null;
             if (index != -1) {
                 tab = tabs.get(index);
+                CmdLinker.this.appearance = tab.getAppearance();
             }
             menuBar.setTabMenu(tab);
         });
@@ -77,11 +78,6 @@ public class CmdLinker extends JFrame  {
 
     protected CmdLinker(CmdLinker copy) {
         this(new Appearance(copy.appearance));
-        this.setOptionsHandler(copy.optionsHandler);
-        this.lastScript = copy.lastScript;
-        this.lastCommand = copy.lastCommand;
-        this.runScriptDialog.copyParameters(copy.runScriptDialog);
-        this.runCommandDialog.copyParameters(copy.runCommandDialog);
         copy.optionsHandler.registerWindow(copy, this);
     }
 
@@ -93,31 +89,14 @@ public class CmdLinker extends JFrame  {
         runCommandDialog = new RunCommandDialog(this, optionsHandler);
     }
 
-    /**
-     * Called from the Gui
-     */
-    public void changeDisplay() {
-        //TODO!!!!
-//        DisplayDialog cd = new DisplayDialog(this, appearance);
-//        cd.setVisible(true);
-//        if (cd.okPressed()) {
-//            appearance = cd.getAppearance();
-//            optionsHandler.setDisplayProperties(appearance);
-//            if (!tabs.isEmpty()) {
-//                if (JOptionPane.YES_OPTION == JOptionPane
-//                        .showConfirmDialog(
-//                                this,
-//                                "Set up these colors on existing consoles?"
-//                                        + "\n(Answering 'No' implies that the colors are only used on new consoles)",
-//                                "Colors change", JOptionPane.YES_NO_OPTION)) {
-//                    for (Tab tab : tabs) {
-//                        tab.setColors(foreground, background);
-//                        tab.setTextFont(font);
-//                    }
-//                }
-//            }
-//        }
+    public void setColorsAndFont(Appearance appearance) {
+        for (Tab tab : tabs) {
+            tab.setColorsAndFont(appearance);
+        }
+        this.appearance.setBackground(appearance.getBackground());
+        this.appearance.setFont(appearance.getFont());
     }
+
 
     public void setPersistOptions(boolean persist) {
         menuBar.saveOptions(persist);
@@ -189,7 +168,6 @@ public class CmdLinker extends JFrame  {
         firstScriptTab = tabs.size();
         try {
             execute(command, appearance);
-//            showTab("1");
         } catch (ScriptCommandException sce) {
             JOptionPane.showMessageDialog(this, sce.getMessage(),
                     "Invalid command", JOptionPane.ERROR_MESSAGE);
@@ -342,7 +320,6 @@ public class CmdLinker extends JFrame  {
         menuBar.enableCloseAll(true);
         return ret;
     }
-
 
     /**
      * **************************************************************************

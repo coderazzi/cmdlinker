@@ -13,13 +13,9 @@ import javax.swing.KeyStroke;
 
 public class TabMenu {
     private int stopItem;
-
     private final JPopupMenu popupMenu;
-
     private JMenuItem stopPopup, stopMenu;
-
-    private ActionListener copy, clear, search, display, restart, close, stop,
-            rename;
+    private ActionListener copy, clear, display, restart, close, stop, rename;
 
     public TabMenu(Tab owner) {
         createActionListeners(owner);
@@ -75,19 +71,12 @@ public class TabMenu {
         ret.add(item);
         ret.add(null); // separator
 
-        item = new JMenuItem("Search ...");
-        item.addActionListener(search);
-        item.setEnabled(false);
-
-        ret.add(item);
-        ret.add(null); // separator
-
         item = new JMenuItem("Rename ...");
         item.addActionListener(rename);
 
         ret.add(item);
 
-        item = new JMenuItem("Display ...");
+        item = new JMenuItem("Appearance ...");
         item.addActionListener(display);
 
         ret.add(item);
@@ -119,11 +108,8 @@ public class TabMenu {
     private void createActionListeners(final Tab owner) {
         copy = e -> owner.copyToClipboard();
         clear = e -> owner.clearTextArea();
-        search = e -> {
-
-        };
         rename = e -> owner.rename();
-        display = e -> owner.changeDisplay();
+        display = e -> owner.showAppearanceMenu();
         restart = e -> owner.restartCommand();
         stop = e -> owner.stopCommand();
         close = e -> owner.close();

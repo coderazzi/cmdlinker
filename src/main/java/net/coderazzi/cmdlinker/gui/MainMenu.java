@@ -29,7 +29,7 @@ public class MainMenu extends JMenuBar {
 
     public void setOptionsHandler(final OptionsHandler optionsHandler) {
         assert !saveOptions.isEnabled();
-        saveOptions.addChangeListener(e -> optionsHandler.persistOptions(saveOptions.isSelected()));
+        saveOptions.addChangeListener(e -> optionsHandler.updatePersistOptions(saveOptions.isSelected()));
     }
 
     public void saveOptions(boolean enable) {
@@ -60,7 +60,6 @@ public class MainMenu extends JMenuBar {
         consoleMenu.setEnabled(false);
         add(initFileMenuItems());
         add(consoleMenu);
-        add(initOptionMenuItems());
         add(initHelpMenuItems());
     }
 
@@ -102,6 +101,10 @@ public class MainMenu extends JMenuBar {
         menu.add(closeAll);
         menu.addSeparator();
 
+        saveOptions = new JCheckBoxMenuItem("Save state automatically");
+        menu.add(saveOptions);
+
+        menu.addSeparator();
         item = new JMenuItem("Exit", KeyEvent.VK_X);
         item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4,
                 ActionEvent.ALT_MASK));
@@ -122,18 +125,5 @@ public class MainMenu extends JMenuBar {
         menu.add(item);
 
         return menu;
-    }
-
-    private JMenu initOptionMenuItems() {
-        JMenu optionsMenu = new JMenu("Options");
-        optionsMenu.setMnemonic(KeyEvent.VK_O);
-        JMenuItem item = new JMenuItem("Display...");
-        item.addActionListener(e -> owner.changeDisplay());
-        optionsMenu.add(item);
-        optionsMenu.addSeparator();
-
-        saveOptions = new JCheckBoxMenuItem("Save options");
-        optionsMenu.add(saveOptions);
-        return optionsMenu;
     }
 }

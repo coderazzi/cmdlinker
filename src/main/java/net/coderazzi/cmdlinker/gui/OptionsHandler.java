@@ -107,8 +107,7 @@ public class OptionsHandler {
         } else {
             Point pp = parent.getLocation();
             Dimension size = parent.getSize();
-            positionWindow(child, pp.x + 20, pp.y + 20, size.width,
-                    size.height);
+            positionWindow(child, pp.x + 20, pp.y + 20, size.width, size.height);
         }
         child.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -121,10 +120,12 @@ public class OptionsHandler {
             public void windowClosed(WindowEvent e) {
                 windows.remove(child);
                 if (windows.isEmpty()) {
-                    if (usingPersistence)
+                    if (usingPersistence) {
                         savePropertiesFile();
-                    else
+                    }
+                    else {
                         removePropertiesFile();
+                    }
                     System.exit(0);
                 }
             }
@@ -141,7 +142,7 @@ public class OptionsHandler {
         window.setLocation(x, y);
     }
 
-    public void persistOptions(boolean enable) {
+    public void updatePersistOptions(boolean enable) {
         if (enable != usingPersistence) {
             usingPersistence = enable;
             for (CmdLinker window : windows)
@@ -230,7 +231,7 @@ public class OptionsHandler {
     }
 
     private File getPropertyFile() {
-        return new File(System.getProperty("user.home", ""), "cmdlinker.conf");
+        return new File(System.getProperty("user.home", ""), ".cmdlinker.conf");
     }
 
     private void handleInitialArgs(String[] args) {
@@ -296,11 +297,10 @@ public class OptionsHandler {
     }
 
     private String getHelpString() {
-        return String
-                .format(
-                        "Syntax: [%s] [%s color] [%s color] [%s fontSize] [script | %s command [...]]",
-                        HELP_OPTION, FOREGROUND_OPTION, BACKGROUND_OPTION,
-                        FONT_OPTION, COMMAND_OPTION);
+        return String.format(
+            "Syntax: [%s] [%s color] [%s color] [%s fontSize] [script | %s command [...]]",
+            HELP_OPTION, FOREGROUND_OPTION, BACKGROUND_OPTION,
+            FONT_OPTION, COMMAND_OPTION);
     }
 
 }
