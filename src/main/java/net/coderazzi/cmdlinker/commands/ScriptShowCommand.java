@@ -7,7 +7,7 @@ import net.coderazzi.cmdlinker.gui.CmdLinker;
 /**
  * Command to show a specific tab syntax: showTab [name|number]
  */
-public class ScriptShowTabCommand implements ScriptCommand {
+public class ScriptShowCommand implements ScriptCommand {
 
     @Override
     public String getCommand() {

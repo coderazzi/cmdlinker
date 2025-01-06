@@ -24,6 +24,7 @@ import net.coderazzi.cmdlinker.CommandExecutor;
 
 public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
     final static private int MAX_LINE_LENGTH_TO_CUT = 80;
+    final static private int MAX_DOCUMENT_SIZE = 80000;
 
     private final TabStatus status;
     private final StringBuilder buffer = new StringBuilder();
@@ -212,8 +213,7 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
     }
 
     private int getMaxBufferSize() {
-        return Integer.MAX_VALUE; // ensure it is more than
-                                    // MAX_LINE_LENGTH_TO_CUT
+        return MAX_DOCUMENT_SIZE;
     }
 
     private int restrictDocumentSize(int docLength) {
@@ -266,7 +266,7 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
         });
     }
 
-    public synchronized void commandOutput(String line) {
+    public synchronized void appendOutputLine(String line) {
         boolean empty = buffer.length() == 0;
         buffer.append(line).append("\n");
         if (empty)
@@ -282,9 +282,8 @@ public class Tab extends JPanel implements CommandExecutor.Client, Runnable {
         });
     }
 
-    public void errorOnCommand(String error, String reason) {
-        JOptionPane.showMessageDialog(this, reason, error,
-                JOptionPane.ERROR_MESSAGE);
+    public void errorOnCommand(String process, String error) {
+        JOptionPane.showMessageDialog(this, error, process, JOptionPane.ERROR_MESSAGE);
         updateOutput();
     }
 

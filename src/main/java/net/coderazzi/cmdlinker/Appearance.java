@@ -21,7 +21,7 @@ public class Appearance {
     public Appearance(Appearance appearance)  {
         foreground = appearance.foreground;
         background = appearance.background;
-//        title = appearance.title;
+        title = appearance.title;
         font = appearance.font;
         autoScroll = appearance.autoScroll;
     }

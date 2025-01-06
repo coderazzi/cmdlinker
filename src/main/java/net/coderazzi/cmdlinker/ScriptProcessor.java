@@ -15,7 +15,7 @@ import javax.swing.*;
 public class ScriptProcessor {
     private final CmdLinker owner;
     private final HashMap<String, ScriptCommand> commands = new HashMap<>();
-    private transient boolean aborted, running;
+    private volatile boolean aborted, running;
 
     public ScriptProcessor(CmdLinker owner) {
         this.owner = owner;
@@ -25,7 +25,7 @@ public class ScriptProcessor {
         addCommand(new ScriptTabCommand());
         addCommand(new ScriptFontCommand());
         addCommand(new ScriptScrollCommand());
-        addCommand(new ScriptShowTabCommand());
+        addCommand(new ScriptShowCommand());
         addCommand(new ScriptWaitCommand());
     }
 

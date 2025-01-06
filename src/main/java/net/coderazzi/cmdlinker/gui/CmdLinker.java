@@ -29,12 +29,12 @@ public class CmdLinker extends JFrame  {
     private Appearance appearance;
     private JTabbedPane tabsPane;
     private ProcessingScriptSplashScreen splashScreen;
-    private transient boolean aborted, revertChangesIfAborted;
     private int firstScriptTab;
     private String lastScript, lastCommand;
     private RunScriptDialog runScriptDialog;
     private RunCommandDialog runCommandDialog;
     private OptionsHandler optionsHandler;
+    private volatile boolean aborted, revertChangesIfAborted;
     private final Pattern separatorPattern = Pattern
             .compile("^(?:\"((\\\\.|[^\\\\\"])*)\"|([^\"]\\S*))\\s*(.*)$");
 
@@ -308,8 +308,8 @@ public class CmdLinker extends JFrame  {
     /**
      * ScriptProcessorListener interface
      */
-    public void showTab(String which) {
-        executeSwingTask(new TabShower(which));
+    public void showTab(String which) throws ScriptCommandException {
+        executeSwingTask(new TabSelector(which));
     }
 
     private Tab createTab(Appearance appearance) {
@@ -363,48 +363,36 @@ public class CmdLinker extends JFrame  {
      * Runnable to show a given tab
      * **************************************************************************
      */
-    class TabShower implements Runnable {
-        final String name;
+    class TabSelector implements Runnable {
+        private int index;
 
-        public TabShower(String name) {
-            this.name = name;
-        }
-
-        private int getTabIndex() {
-            if (tabs.isEmpty()) {
-                JOptionPane
-                        .showMessageDialog(CmdLinker.this, "showTab",
-                                "There are no tabs to show!",
-                                JOptionPane.ERROR_MESSAGE);
-                return -1;
+        public TabSelector(String name) throws ScriptCommandException {
+            index = -1;
+            if (!tabs.isEmpty() && !name.isEmpty()) {
+                for (int i = firstScriptTab; i < tabs.size(); i++) {
+                    Tab tab = tabs.get(i);
+                    if (name.equals(tab.getAppearance().getTitle())) {
+                        index = i;
+                        break;
+                    }
+                }
+                if (index == -1) {
+                    try {
+                        index = firstScriptTab + Integer.parseInt(name) - 1;
+                    } catch (NumberFormatException ne) {
+                        // index remains -1
+                    }
+                }
+                if (index < 0 || index >= tabs.size()) {
+                    throw new ScriptCommandException("There is no tab to show named " + name);
+                }
             }
-            if (name.isEmpty()) {
-                return tabs.size() - 1;
-            }
-            for (int i = firstScriptTab; i < tabs.size(); i++) {
-                Tab tab = tabs.get(i);
-                if (name.equals(tab.getName()))
-                    return i;
-            }
-            int index = -1;
-            try {
-                index = firstScriptTab + Integer.parseInt(name) - 1;
-            } catch (NumberFormatException ne) {
-                // index remains -1
-            }
-            if (index < 0 || index >= tabs.size()) {
-                JOptionPane.showMessageDialog(CmdLinker.this, "showTab",
-                        "There is no tab to show named " + name,
-                        JOptionPane.ERROR_MESSAGE);
-                return -1;
-            }
-            return index;
         }
 
         public void run() {
-            int index = getTabIndex();
-            if (index != -1)
+            if (index != -1) {
                 tabsPane.setSelectedIndex(index);
+            }
         }
     }
 

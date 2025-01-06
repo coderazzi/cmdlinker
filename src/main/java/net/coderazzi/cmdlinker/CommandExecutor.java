@@ -11,22 +11,16 @@ public class CommandExecutor {
     }
 
     public interface Client {
-        void errorOnCommand(String error, String reason);
-
+        void errorOnCommand(String process, String error);
         void commandStarted(String process);
-
         void commandCompleted(ExecutionEnd how, int errorCode);
-
-        void commandOutput(String line);
+        void appendOutputLine(String line);
     }
 
     private final Client client;
-
     private ProcessBuilder builder;
-
     private Process process;
-
-    private transient boolean destroyed, busy;
+    private volatile boolean destroyed, busy;
 
     public CommandExecutor(Client client) {
         assert client != null;
@@ -97,8 +91,7 @@ public class CommandExecutor {
         } catch (IOException ioex) {
             if (!destroyed) {
                 howEnded = ExecutionEnd.ExceptionError;
-                client.errorOnCommand("Could not start " + describeProcess(),
-                        "Reason: " + ioex.getMessage());
+                client.errorOnCommand( describeProcess(), "Could not start: " + ioex.getMessage());
             }
         } catch (InterruptedException ie) {
             howEnded = ExecutionEnd.ExceptionError;
@@ -128,14 +121,13 @@ public class CommandExecutor {
                 .getInputStream()))) {
             String line = br.readLine();
             while (line != null) {
-                client.commandOutput(line);
+                client.appendOutputLine(line);
                 line = br.readLine();
             }
             return true;
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             if (!destroyed)
-                client.errorOnCommand("Error executing " + describeProcess(),
-                        ex.toString());
+                client.errorOnCommand(describeProcess(), ex.toString());
         }
         return false;
     }
