@@ -6,7 +6,7 @@
   <groupId>net.coderazzi</groupId>
   <artifactId>cmdlinker</artifactId>
   <packaging>jar</packaging>
-  <version>0.9.8</version>
+  <version>0.98</version>
   <name>cmdlinker</name>
   <properties>
           <exec.mainClass>net.coderazzi.cmdlinker.gui.CmdLinker</exec.mainClass>
